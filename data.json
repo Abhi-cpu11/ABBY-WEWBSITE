@@ -18,6 +18,23 @@
       "ts_pct": 59.2,
       "color": "#2563eb"
     },
+        {
+  "id": "uconn",
+  "name": "UConn",
+  "region": "East",
+  "conference": "Big East",
+  "ppg": 85.7,
+  "rpg": 38.9,
+  "apg": 17.3,
+  "bpg": 5.8,
+  "spg": 8.0,
+  "plus_minus": 18.3,
+  "fg_pct": 49.1,
+  "three_pt_pct": 37.4,
+  "ft_pct": 76.9,
+  "ts_pct": 59.2,
+  "color": "#0C2340"
+    },
     {
       "id": "north-carolina",
       "name": "North Carolina",
