@@ -357,4 +357,49 @@ svg text {
   .comparison-layout {
     grid-template-columns: 1fr;
   }
+  .team-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+
+.favorite-btn {
+  background: transparent;
+  border: 1px solid #374151;
+  color: #facc15;
+  border-radius: 10px;
+  padding: 6px 10px;
+  cursor: pointer;
+  font-size: 18px;
+  line-height: 1;
+}
+
+.favorite-btn:hover {
+  background: #1f2937;
+}
+
+.favorite-btn:focus {
+  outline: 2px solid #f97316;
+  outline-offset: 2px;
+}
+.team-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 14px;
+}
+
+.team-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.team-logo {
+  width: 40px;
+  height: 40px;
+  object-fit: contain;
+}
 }

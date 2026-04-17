@@ -1,9 +1,9 @@
-
 let teams = [];
 let selectedTeamA = null;
 let selectedTeamB = null;
 let currentPage = "dashboard";
 let searchTerm = "";
+let favoriteTeamIds = JSON.parse(localStorage.getItem("favoriteTeamIds") || "[]");
 
 async function loadTeams() {
   try {
@@ -26,6 +26,25 @@ async function loadTeams() {
       </div>
     `;
   }
+}
+
+function saveFavorites() {
+  localStorage.setItem("favoriteTeamIds", JSON.stringify(favoriteTeamIds));
+}
+
+function isFavorite(teamId) {
+  return favoriteTeamIds.includes(teamId);
+}
+
+function toggleFavorite(teamId) {
+  if (isFavorite(teamId)) {
+    favoriteTeamIds = favoriteTeamIds.filter(id => id !== teamId);
+  } else {
+    favoriteTeamIds.push(teamId);
+  }
+
+  saveFavorites();
+  renderTeams();
 }
 
 function offenseRating(team) {
@@ -73,15 +92,26 @@ function updateMatchupBar() {
 function getFilteredTeams() {
   const normalized = searchTerm.trim().toLowerCase();
 
-  if (!normalized) {
-    return teams;
+  let filtered = teams;
+
+  if (normalized) {
+    filtered = teams.filter(team =>
+      team.name.toLowerCase().includes(normalized) ||
+      team.conference.toLowerCase().includes(normalized) ||
+      team.region.toLowerCase().includes(normalized)
+    );
   }
 
-  return teams.filter(team =>
-    team.name.toLowerCase().includes(normalized) ||
-    team.conference.toLowerCase().includes(normalized) ||
-    team.region.toLowerCase().includes(normalized)
-  );
+  return [...filtered].sort((a, b) => {
+    const aFav = isFavorite(a.id) ? 1 : 0;
+    const bFav = isFavorite(b.id) ? 1 : 0;
+
+    if (bFav !== aFav) {
+      return bFav - aFav;
+    }
+
+    return a.name.localeCompare(b.name);
+  });
 }
 
 function renderTeams() {
@@ -121,8 +151,16 @@ function renderTeams() {
 
     card.innerHTML = `
       <div class="team-color" style="background:${team.color}"></div>
-      <div class="team-name">${team.name}</div>
-      <div class="team-conf">${team.conference} • ${team.region}</div>
+
+      <div class="team-header">
+        <div>
+          <div class="team-name">${team.name}</div>
+          <div class="team-conf">${team.conference} • ${team.region}</div>
+        </div>
+        <button class="favorite-btn" aria-label="Toggle favorite">
+          ${isFavorite(team.id) ? "★" : "☆"}
+        </button>
+      </div>
 
       <div class="stats">
         <div class="stat-box">
@@ -149,7 +187,13 @@ function renderTeams() {
       ${note}
     `;
 
-    card.querySelector("button").onclick = () => selectTeam(team);
+    card.querySelector(".select-btn").onclick = () => selectTeam(team);
+
+    card.querySelector(".favorite-btn").onclick = (event) => {
+      event.stopPropagation();
+      toggleFavorite(team.id);
+    };
+
     grid.appendChild(card);
   });
 
