@@ -16,7 +16,9 @@
             "ft_pct": "74.6",
             "ts_pct": "61.2",
             "_conference": "ACC",
-            "image": "images/duke.png"
+            "image": "images/duke.png",
+            "offstat": 113.05,
+            "defstat": 91.46
           },
           {
             "name": "North Carolina",
@@ -30,7 +32,9 @@
             "three_pt_pct": "35.9",
             "ft_pct": "73.5",
             "ts_pct": "57.8",
-            "_conference": "ACC"
+            "_conference": "ACC",
+            "offstat": 110.41,
+            "defstat": 94.14
           },
           {
             "name": "NC State",
@@ -44,7 +48,9 @@
             "three_pt_pct": "38.8",
             "ft_pct": "76.8",
             "ts_pct": "57.5",
-            "_conference": "ACC"
+            "_conference": "ACC",
+            "offstat": 112.07,
+            "defstat": 93.59
           },
           {
             "name": "Clemson",
@@ -58,7 +64,9 @@
             "three_pt_pct": "36.2",
             "ft_pct": "74.8",
             "ts_pct": "57.1",
-            "_conference": "ACC"
+            "_conference": "ACC",
+            "offstat": 108.92,
+            "defstat": 93.89
           },
           {
             "name": "Miami (FL)",
@@ -72,7 +80,9 @@
             "three_pt_pct": "36.5",
             "ft_pct": "74.0",
             "ts_pct": "57.4",
-            "_conference": "ACC"
+            "_conference": "ACC",
+            "offstat": 109.53,
+            "defstat": 93.83
           },
           {
             "name": "Pittsburgh",
@@ -86,7 +96,9 @@
             "three_pt_pct": "34.4",
             "ft_pct": "72.1",
             "ts_pct": "54.7",
-            "_conference": "ACC"
+            "_conference": "ACC",
+            "offstat": 105.54,
+            "defstat": 96.21
           },
           {
             "name": "Florida State",
@@ -100,7 +112,9 @@
             "three_pt_pct": "34.7",
             "ft_pct": "73.0",
             "ts_pct": "55.9",
-            "_conference": "ACC"
+            "_conference": "ACC",
+            "offstat": 106.66,
+            "defstat": 94.15
           },
           {
             "name": "Notre Dame",
@@ -114,7 +128,9 @@
             "three_pt_pct": "33.8",
             "ft_pct": "72.4",
             "ts_pct": "54.2",
-            "_conference": "ACC"
+            "_conference": "ACC",
+            "offstat": 103.86,
+            "defstat": 96.65
           },
           {
             "name": "Wake Forest",
@@ -128,7 +144,9 @@
             "three_pt_pct": "35.1",
             "ft_pct": "73.9",
             "ts_pct": "55.5",
-            "_conference": "ACC"
+            "_conference": "ACC",
+            "offstat": 106.56,
+            "defstat": 96.08
           },
           {
             "name": "Louisville",
@@ -142,7 +160,9 @@
             "three_pt_pct": "35.7",
             "ft_pct": "76.9",
             "ts_pct": "57.3",
-            "_conference": "ACC"
+            "_conference": "ACC",
+            "offstat": 112.06,
+            "defstat": 93.3
           },
           {
             "name": "Syracuse",
@@ -156,7 +176,9 @@
             "three_pt_pct": "33.2",
             "ft_pct": "71.4",
             "ts_pct": "53.9",
-            "_conference": "ACC"
+            "_conference": "ACC",
+            "offstat": 104.04,
+            "defstat": 91.75
           },
           {
             "name": "Virginia",
@@ -170,7 +192,9 @@
             "three_pt_pct": "36.6",
             "ft_pct": "77.5",
             "ts_pct": "57.0",
-            "_conference": "ACC"
+            "_conference": "ACC",
+            "offstat": 105.47,
+            "defstat": 93.36
           },
           {
             "name": "Virginia Tech",
@@ -184,7 +208,9 @@
             "three_pt_pct": "34.0",
             "ft_pct": "72.7",
             "ts_pct": "54.4",
-            "_conference": "ACC"
+            "_conference": "ACC",
+            "offstat": 104.75,
+            "defstat": 96.7
           },
           {
             "name": "Georgia Tech",
@@ -198,7 +224,9 @@
             "three_pt_pct": "32.0",
             "ft_pct": "69.8",
             "ts_pct": "52.3",
-            "_conference": "ACC"
+            "_conference": "ACC",
+            "offstat": 101.06,
+            "defstat": 97.64
           },
           {
             "name": "Boston College",
@@ -212,7 +240,9 @@
             "three_pt_pct": "31.4",
             "ft_pct": "68.5",
             "ts_pct": "51.8",
-            "_conference": "ACC"
+            "_conference": "ACC",
+            "offstat": 99.53,
+            "defstat": 99.11
           },
           {
             "name": "Stanford",
@@ -226,7 +256,9 @@
             "three_pt_pct": "34.8",
             "ft_pct": "73.6",
             "ts_pct": "55.3",
-            "_conference": "ACC"
+            "_conference": "ACC",
+            "offstat": 106.81,
+            "defstat": 95.61
           },
           {
             "name": "California",
@@ -240,7 +272,9 @@
             "three_pt_pct": "32.8",
             "ft_pct": "70.8",
             "ts_pct": "53.4",
-            "_conference": "ACC"
+            "_conference": "ACC",
+            "offstat": 102.6,
+            "defstat": 97.22
           },
           {
             "name": "SMU",
@@ -254,7 +288,9 @@
             "three_pt_pct": "37.4",
             "ft_pct": "74.1",
             "ts_pct": "57.8",
-            "_conference": "ACC"
+            "_conference": "ACC",
+            "offstat": 112.41,
+            "defstat": 94.21
           },
           {
             "name": "Purdue",
@@ -268,7 +304,9 @@
             "three_pt_pct": "36.3",
             "ft_pct": "76.8",
             "ts_pct": "57.7",
-            "_conference": "Big Ten"
+            "_conference": "Big Ten",
+            "offstat": 110.11,
+            "defstat": 92.77
           },
           {
             "name": "Ohio State",
@@ -282,7 +320,9 @@
             "three_pt_pct": "35.7",
             "ft_pct": "74.4",
             "ts_pct": "56.2",
-            "_conference": "Big Ten"
+            "_conference": "Big Ten",
+            "offstat": 108.64,
+            "defstat": 93.9
           },
           {
             "name": "Michigan State",
@@ -296,7 +336,9 @@
             "three_pt_pct": "35.4",
             "ft_pct": "75.0",
             "ts_pct": "56.8",
-            "_conference": "Big Ten"
+            "_conference": "Big Ten",
+            "offstat": 110,
+            "defstat": 92.29
           },
           {
             "name": "Illinois",
@@ -310,7 +352,9 @@
             "three_pt_pct": "34.7",
             "ft_pct": "78.9",
             "ts_pct": "57.6",
-            "_conference": "Big Ten"
+            "_conference": "Big Ten",
+            "offstat": 111.76,
+            "defstat": 92.3
           },
           {
             "name": "Indiana",
@@ -324,7 +368,9 @@
             "three_pt_pct": "34.2",
             "ft_pct": "73.5",
             "ts_pct": "55.1",
-            "_conference": "Big Ten"
+            "_conference": "Big Ten",
+            "offstat": 106.09,
+            "defstat": 95.26
           },
           {
             "name": "Maryland",
@@ -338,7 +384,9 @@
             "three_pt_pct": "33.5",
             "ft_pct": "71.9",
             "ts_pct": "53.7",
-            "_conference": "Big Ten"
+            "_conference": "Big Ten",
+            "offstat": 104,
+            "defstat": 96.15
           },
           {
             "name": "Wisconsin",
@@ -352,7 +400,9 @@
             "three_pt_pct": "35.6",
             "ft_pct": "75.5",
             "ts_pct": "56.1",
-            "_conference": "Big Ten"
+            "_conference": "Big Ten",
+            "offstat": 106.3,
+            "defstat": 95.82
           },
           {
             "name": "Penn State",
@@ -366,7 +416,9 @@
             "three_pt_pct": "33.1",
             "ft_pct": "70.5",
             "ts_pct": "52.6",
-            "_conference": "Big Ten"
+            "_conference": "Big Ten",
+            "offstat": 101.56,
+            "defstat": 97.38
           },
           {
             "name": "Michigan",
@@ -380,7 +432,9 @@
             "three_pt_pct": "36.0",
             "ft_pct": "74.7",
             "ts_pct": "59.8",
-            "_conference": "Big Ten"
+            "_conference": "Big Ten",
+            "offstat": 114.07,
+            "defstat": 91.86
           },
           {
             "name": "Nebraska",
@@ -394,7 +448,9 @@
             "three_pt_pct": "34.9",
             "ft_pct": "73.4",
             "ts_pct": "55.8",
-            "_conference": "Big Ten"
+            "_conference": "Big Ten",
+            "offstat": 107.11,
+            "defstat": 95.03
           },
           {
             "name": "Minnesota",
@@ -408,7 +464,9 @@
             "three_pt_pct": "33.4",
             "ft_pct": "71.8",
             "ts_pct": "54.0",
-            "_conference": "Big Ten"
+            "_conference": "Big Ten",
+            "offstat": 104.13,
+            "defstat": 96.94
           },
           {
             "name": "Iowa",
@@ -422,7 +480,9 @@
             "three_pt_pct": "37.8",
             "ft_pct": "77.5",
             "ts_pct": "58.3",
-            "_conference": "Big Ten"
+            "_conference": "Big Ten",
+            "offstat": 111.19,
+            "defstat": 96.01
           },
           {
             "name": "Northwestern",
@@ -436,7 +496,9 @@
             "three_pt_pct": "32.4",
             "ft_pct": "70.1",
             "ts_pct": "52.7",
-            "_conference": "Big Ten"
+            "_conference": "Big Ten",
+            "offstat": 101.93,
+            "defstat": 98.54
           },
           {
             "name": "Rutgers",
@@ -450,7 +512,9 @@
             "three_pt_pct": "31.3",
             "ft_pct": "68.8",
             "ts_pct": "52.1",
-            "_conference": "Big Ten"
+            "_conference": "Big Ten",
+            "offstat": 100.23,
+            "defstat": 97.19
           },
           {
             "name": "UCLA",
@@ -464,7 +528,9 @@
             "three_pt_pct": "35.5",
             "ft_pct": "74.1",
             "ts_pct": "56.4",
-            "_conference": "Big Ten"
+            "_conference": "Big Ten",
+            "offstat": 108.59,
+            "defstat": 93.75
           },
           {
             "name": "USC",
@@ -478,7 +544,9 @@
             "three_pt_pct": "34.1",
             "ft_pct": "72.8",
             "ts_pct": "54.8",
-            "_conference": "Big Ten"
+            "_conference": "Big Ten",
+            "offstat": 105.85,
+            "defstat": 95.56
           },
           {
             "name": "Oregon",
@@ -492,7 +560,9 @@
             "three_pt_pct": "33.0",
             "ft_pct": "71.2",
             "ts_pct": "53.1",
-            "_conference": "Big Ten"
+            "_conference": "Big Ten",
+            "offstat": 102.75,
+            "defstat": 97.19
           },
           {
             "name": "Washington",
@@ -506,7 +576,9 @@
             "three_pt_pct": "34.3",
             "ft_pct": "72.5",
             "ts_pct": "54.3",
-            "_conference": "Big Ten"
+            "_conference": "Big Ten",
+            "offstat": 104.87,
+            "defstat": 95.99
           },
           {
             "name": "Florida",
@@ -520,7 +592,9 @@
             "three_pt_pct": "30.8",
             "ft_pct": "71.0",
             "ts_pct": "56.1",
-            "_conference": "SEC"
+            "_conference": "SEC",
+            "offstat": 111.89,
+            "defstat": 87.82
           },
           {
             "name": "Tennessee",
@@ -534,7 +608,9 @@
             "three_pt_pct": "34.5",
             "ft_pct": "73.6",
             "ts_pct": "56.2",
-            "_conference": "SEC"
+            "_conference": "SEC",
+            "offstat": 108.05,
+            "defstat": 87.85
           },
           {
             "name": "Kentucky",
@@ -548,7 +624,9 @@
             "three_pt_pct": "33.4",
             "ft_pct": "72.8",
             "ts_pct": "55.4",
-            "_conference": "SEC"
+            "_conference": "SEC",
+            "offstat": 107.87,
+            "defstat": 92.07
           },
           {
             "name": "Georgia",
@@ -562,7 +640,9 @@
             "three_pt_pct": "34.1",
             "ft_pct": "75.4",
             "ts_pct": "57.4",
-            "_conference": "SEC"
+            "_conference": "SEC",
+            "offstat": 114.34,
+            "defstat": 89.73
           },
           {
             "name": "South Carolina",
@@ -576,7 +656,9 @@
             "three_pt_pct": "31.2",
             "ft_pct": "68.9",
             "ts_pct": "52.4",
-            "_conference": "SEC"
+            "_conference": "SEC",
+            "offstat": 100.73,
+            "defstat": 96.11
           },
           {
             "name": "Missouri",
@@ -590,7 +672,9 @@
             "three_pt_pct": "33.9",
             "ft_pct": "72.0",
             "ts_pct": "54.5",
-            "_conference": "SEC"
+            "_conference": "SEC",
+            "offstat": 105.59,
+            "defstat": 95.47
           },
           {
             "name": "Vanderbilt",
@@ -604,7 +688,9 @@
             "three_pt_pct": "35.5",
             "ft_pct": "79.3",
             "ts_pct": "58.6",
-            "_conference": "SEC"
+            "_conference": "SEC",
+            "offstat": 113.51,
+            "defstat": 93.84
           },
           {
             "name": "West Virginia",
@@ -618,7 +704,9 @@
             "three_pt_pct": "33.1",
             "ft_pct": "71.5",
             "ts_pct": "54.2",
-            "_conference": "Big 12"
+            "_conference": "Big 12",
+            "offstat": 103.99,
+            "defstat": 94.5
           },
           {
             "name": "Cincinnati",
@@ -632,7 +720,9 @@
             "three_pt_pct": "34.5",
             "ft_pct": "73.1",
             "ts_pct": "55.0",
-            "_conference": "Big 12"
+            "_conference": "Big 12",
+            "offstat": 106.16,
+            "defstat": 94.52
           },
           {
             "name": "UCF",
@@ -646,7 +736,9 @@
             "three_pt_pct": "34.8",
             "ft_pct": "72.9",
             "ts_pct": "55.1",
-            "_conference": "Big 12"
+            "_conference": "Big 12",
+            "offstat": 106.5,
+            "defstat": 96.62
           },
           {
             "name": "South Florida",
@@ -660,7 +752,9 @@
             "three_pt_pct": "33.2",
             "ft_pct": "74.4",
             "ts_pct": "54.6",
-            "_conference": "American"
+            "_conference": "American",
+            "offstat": 111.81,
+            "defstat": 90.76
           },
           {
             "name": "Temple",
@@ -674,7 +768,9 @@
             "three_pt_pct": "31.5",
             "ft_pct": "68.2",
             "ts_pct": "51.9",
-            "_conference": "American"
+            "_conference": "American",
+            "offstat": 100.25,
+            "defstat": 98.33
           },
           {
             "name": "Toledo",
@@ -688,7 +784,9 @@
             "three_pt_pct": "34.6",
             "ft_pct": "72.8",
             "ts_pct": "54.9",
-            "_conference": "MAC"
+            "_conference": "MAC",
+            "offstat": 105.48,
+            "defstat": 95.89
           },
           {
             "name": "Ohio",
@@ -702,7 +800,9 @@
             "three_pt_pct": "33.6",
             "ft_pct": "71.9",
             "ts_pct": "53.7",
-            "_conference": "MAC"
+            "_conference": "MAC",
+            "offstat": 103.75,
+            "defstat": 96.51
           },
           {
             "name": "Akron",
@@ -716,7 +816,9 @@
             "three_pt_pct": "37.9",
             "ft_pct": "75.4",
             "ts_pct": "60.1",
-            "_conference": "MAC"
+            "_conference": "MAC",
+            "offstat": 115.86,
+            "defstat": 93.68
           },
           {
             "name": "Kent State",
@@ -730,7 +832,9 @@
             "three_pt_pct": "35.8",
             "ft_pct": "74.2",
             "ts_pct": "55.8",
-            "_conference": "MAC"
+            "_conference": "MAC",
+            "offstat": 111.48,
+            "defstat": 94.45
           },
           {
             "name": "Ball State",
@@ -744,7 +848,9 @@
             "three_pt_pct": "31.2",
             "ft_pct": "68.0",
             "ts_pct": "51.5",
-            "_conference": "MAC"
+            "_conference": "MAC",
+            "offstat": 99.9,
+            "defstat": 99.43
           },
           {
             "name": "Appalachian State",
@@ -758,7 +864,9 @@
             "three_pt_pct": "33.5",
             "ft_pct": "71.4",
             "ts_pct": "54.1",
-            "_conference": "Sun Belt"
+            "_conference": "Sun Belt",
+            "offstat": 104.75,
+            "defstat": 96.68
           },
           {
             "name": "Georgia Southern",
@@ -772,7 +880,9 @@
             "three_pt_pct": "31.8",
             "ft_pct": "69.1",
             "ts_pct": "52.2",
-            "_conference": "Sun Belt"
+            "_conference": "Sun Belt",
+            "offstat": 101.21,
+            "defstat": 98.47
           },
           {
             "name": "Liberty",
@@ -786,7 +896,9 @@
             "three_pt_pct": "38.5",
             "ft_pct": "75.2",
             "ts_pct": "59.3",
-            "_conference": "CUSA"
+            "_conference": "CUSA",
+            "offstat": 110.1,
+            "defstat": 95.16
           },
           {
             "name": "Middle Tennessee",
@@ -800,7 +912,9 @@
             "three_pt_pct": "32.0",
             "ft_pct": "68.8",
             "ts_pct": "52.0",
-            "_conference": "CUSA"
+            "_conference": "CUSA",
+            "offstat": 100.37,
+            "defstat": 98.73
           }
         ],
         "_name": "East"
@@ -819,7 +933,9 @@
             "three_pt_pct": "35.8",
             "ft_pct": "76.5",
             "ts_pct": "57.0",
-            "_conference": "SEC"
+            "_conference": "SEC",
+            "offstat": 116.04,
+            "defstat": 91.5
           },
           {
             "name": "Auburn",
@@ -833,7 +949,9 @@
             "three_pt_pct": "33.7",
             "ft_pct": "71.5",
             "ts_pct": "54.9",
-            "_conference": "SEC"
+            "_conference": "SEC",
+            "offstat": 107.41,
+            "defstat": 91.62
           },
           {
             "name": "LSU",
@@ -847,7 +965,9 @@
             "three_pt_pct": "32.8",
             "ft_pct": "70.2",
             "ts_pct": "53.8",
-            "_conference": "SEC"
+            "_conference": "SEC",
+            "offstat": 105.12,
+            "defstat": 94.14
           },
           {
             "name": "Arkansas",
@@ -861,7 +981,9 @@
             "three_pt_pct": "38.9",
             "ft_pct": "74.7",
             "ts_pct": "60.2",
-            "_conference": "SEC"
+            "_conference": "SEC",
+            "offstat": 117,
+            "defstat": 90.17
           },
           {
             "name": "Texas",
@@ -875,7 +997,9 @@
             "three_pt_pct": "35.3",
             "ft_pct": "75.2",
             "ts_pct": "57.9",
-            "_conference": "SEC"
+            "_conference": "SEC",
+            "offstat": 111.63,
+            "defstat": 93.8
           },
           {
             "name": "Ole Miss",
@@ -889,7 +1013,9 @@
             "three_pt_pct": "32.7",
             "ft_pct": "71.1",
             "ts_pct": "53.5",
-            "_conference": "SEC"
+            "_conference": "SEC",
+            "offstat": 104.02,
+            "defstat": 97.26
           },
           {
             "name": "Oklahoma",
@@ -903,7 +1029,9 @@
             "three_pt_pct": "33.2",
             "ft_pct": "71.3",
             "ts_pct": "54.1",
-            "_conference": "SEC"
+            "_conference": "SEC",
+            "offstat": 105.24,
+            "defstat": 95.98
           },
           {
             "name": "Texas A&M",
@@ -917,7 +1045,9 @@
             "three_pt_pct": "36.2",
             "ft_pct": "73.7",
             "ts_pct": "56.1",
-            "_conference": "SEC"
+            "_conference": "SEC",
+            "offstat": 113.41,
+            "defstat": 93.77
           },
           {
             "name": "Mississippi State",
@@ -931,7 +1061,9 @@
             "three_pt_pct": "31.8",
             "ft_pct": "69.4",
             "ts_pct": "52.8",
-            "_conference": "SEC"
+            "_conference": "SEC",
+            "offstat": 102.38,
+            "defstat": 96.05
           },
           {
             "name": "Arizona",
@@ -945,7 +1077,9 @@
             "three_pt_pct": "36.0",
             "ft_pct": "73.4",
             "ts_pct": "59.3",
-            "_conference": "Big 12"
+            "_conference": "Big 12",
+            "offstat": 113.65,
+            "defstat": 90.55
           },
           {
             "name": "Baylor",
@@ -959,7 +1093,9 @@
             "three_pt_pct": "34.7",
             "ft_pct": "72.9",
             "ts_pct": "55.5",
-            "_conference": "Big 12"
+            "_conference": "Big 12",
+            "offstat": 107.78,
+            "defstat": 93.27
           },
           {
             "name": "Iowa State",
@@ -973,7 +1109,9 @@
             "three_pt_pct": "36.0",
             "ft_pct": "75.1",
             "ts_pct": "56.8",
-            "_conference": "Big 12"
+            "_conference": "Big 12",
+            "offstat": 109.56,
+            "defstat": 94.17
           },
           {
             "name": "BYU",
@@ -987,7 +1125,9 @@
             "three_pt_pct": "34.9",
             "ft_pct": "74.6",
             "ts_pct": "57.2",
-            "_conference": "Big 12"
+            "_conference": "Big 12",
+            "offstat": 111.34,
+            "defstat": 95.45
           },
           {
             "name": "Kansas",
@@ -1001,7 +1141,9 @@
             "three_pt_pct": "35.9",
             "ft_pct": "74.5",
             "ts_pct": "56.6",
-            "_conference": "Big 12"
+            "_conference": "Big 12",
+            "offstat": 109.53,
+            "defstat": 93.4
           },
           {
             "name": "Kansas State",
@@ -1015,7 +1157,9 @@
             "three_pt_pct": "33.5",
             "ft_pct": "72.0",
             "ts_pct": "53.8",
-            "_conference": "Big 12"
+            "_conference": "Big 12",
+            "offstat": 104.16,
+            "defstat": 96.13
           },
           {
             "name": "TCU",
@@ -1029,7 +1173,9 @@
             "three_pt_pct": "35.1",
             "ft_pct": "73.4",
             "ts_pct": "55.8",
-            "_conference": "Big 12"
+            "_conference": "Big 12",
+            "offstat": 107.56,
+            "defstat": 95.51
           },
           {
             "name": "Arizona State",
@@ -1043,7 +1189,9 @@
             "three_pt_pct": "33.9",
             "ft_pct": "72.2",
             "ts_pct": "54.4",
-            "_conference": "Big 12"
+            "_conference": "Big 12",
+            "offstat": 105.28,
+            "defstat": 96.56
           },
           {
             "name": "Oklahoma State",
@@ -1057,7 +1205,9 @@
             "three_pt_pct": "33.8",
             "ft_pct": "75.1",
             "ts_pct": "55.7",
-            "_conference": "Big 12"
+            "_conference": "Big 12",
+            "offstat": 110.66,
+            "defstat": 95.16
           },
           {
             "name": "Utah",
@@ -1071,7 +1221,9 @@
             "three_pt_pct": "31.9",
             "ft_pct": "70.4",
             "ts_pct": "52.7",
-            "_conference": "Big 12"
+            "_conference": "Big 12",
+            "offstat": 102.05,
+            "defstat": 96.76
           },
           {
             "name": "Houston",
@@ -1085,7 +1237,9 @@
             "three_pt_pct": "33.0",
             "ft_pct": "71.8",
             "ts_pct": "54.8",
-            "_conference": "Big 12"
+            "_conference": "Big 12",
+            "offstat": 103.22,
+            "defstat": 90.18
           },
           {
             "name": "Texas Tech",
@@ -1099,7 +1253,9 @@
             "three_pt_pct": "32.7",
             "ft_pct": "71.0",
             "ts_pct": "53.9",
-            "_conference": "Big 12"
+            "_conference": "Big 12",
+            "offstat": 104,
+            "defstat": 93.57
           },
           {
             "name": "Colorado",
@@ -1113,7 +1269,9 @@
             "three_pt_pct": "31.9",
             "ft_pct": "69.4",
             "ts_pct": "52.6",
-            "_conference": "Big 12"
+            "_conference": "Big 12",
+            "offstat": 102.05,
+            "defstat": 98.16
           },
           {
             "name": "UNLV",
@@ -1127,7 +1285,9 @@
             "three_pt_pct": "35.1",
             "ft_pct": "73.5",
             "ts_pct": "55.4",
-            "_conference": "Mountain West"
+            "_conference": "Mountain West",
+            "offstat": 106.99,
+            "defstat": 95.31
           },
           {
             "name": "Boise State",
@@ -1141,7 +1301,9 @@
             "three_pt_pct": "34.4",
             "ft_pct": "73.1",
             "ts_pct": "55.0",
-            "_conference": "Mountain West"
+            "_conference": "Mountain West",
+            "offstat": 105.24,
+            "defstat": 96.04
           },
           {
             "name": "Fresno State",
@@ -1155,7 +1317,9 @@
             "three_pt_pct": "32.5",
             "ft_pct": "70.3",
             "ts_pct": "52.8",
-            "_conference": "Mountain West"
+            "_conference": "Mountain West",
+            "offstat": 102.15,
+            "defstat": 97.73
           },
           {
             "name": "Nevada",
@@ -1169,7 +1333,9 @@
             "three_pt_pct": "33.8",
             "ft_pct": "71.8",
             "ts_pct": "54.5",
-            "_conference": "Mountain West"
+            "_conference": "Mountain West",
+            "offstat": 105.55,
+            "defstat": 96.57
           },
           {
             "name": "San Diego State",
@@ -1183,7 +1349,9 @@
             "three_pt_pct": "32.1",
             "ft_pct": "70.1",
             "ts_pct": "53.5",
-            "_conference": "Mountain West"
+            "_conference": "Mountain West",
+            "offstat": 101.75,
+            "defstat": 94.26
           },
           {
             "name": "Tulane",
@@ -1197,7 +1365,9 @@
             "three_pt_pct": "35.0",
             "ft_pct": "73.4",
             "ts_pct": "55.3",
-            "_conference": "American"
+            "_conference": "American",
+            "offstat": 105.93,
+            "defstat": 95.5
           },
           {
             "name": "Tulsa",
@@ -1211,7 +1381,9 @@
             "three_pt_pct": "38.8",
             "ft_pct": "78.1",
             "ts_pct": "59.0",
-            "_conference": "American"
+            "_conference": "American",
+            "offstat": 113.77,
+            "defstat": 94.49
           },
           {
             "name": "Louisiana",
@@ -1225,7 +1397,9 @@
             "three_pt_pct": "33.4",
             "ft_pct": "71.5",
             "ts_pct": "53.7",
-            "_conference": "Sun Belt"
+            "_conference": "Sun Belt",
+            "offstat": 103.49,
+            "defstat": 96.36
           },
           {
             "name": "Arkansas State",
@@ -1239,7 +1413,9 @@
             "three_pt_pct": "33.3",
             "ft_pct": "73.3",
             "ts_pct": "54.7",
-            "_conference": "Sun Belt"
+            "_conference": "Sun Belt",
+            "offstat": 109.49,
+            "defstat": 92.44
           },
           {
             "name": "UTSA",
@@ -1253,7 +1429,9 @@
             "three_pt_pct": "31.9",
             "ft_pct": "69.7",
             "ts_pct": "52.0",
-            "_conference": "American"
+            "_conference": "American",
+            "offstat": 100.35,
+            "defstat": 98.68
           },
           {
             "name": "New Mexico State",
@@ -1267,7 +1445,9 @@
             "three_pt_pct": "33.3",
             "ft_pct": "71.6",
             "ts_pct": "53.9",
-            "_conference": "CUSA"
+            "_conference": "CUSA",
+            "offstat": 103.96,
+            "defstat": 96.35
           }
         ],
         "_name": "West"

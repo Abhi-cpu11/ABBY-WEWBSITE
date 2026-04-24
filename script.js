@@ -34,6 +34,8 @@ async function loadTeams() {
         three_pt_pct: toNumber(team.three_pt_pct),
         ft_pct: toNumber(team.ft_pct),
         ts_pct: toNumber(team.ts_pct),
+        offstat: toNumber(team.offstat),
+        defstat: toNumber(team.defstat),
 
         image: team.image || "",
         color: "#f97316",
@@ -87,16 +89,11 @@ function toggleFavorite(teamId) {
 }
 
 function offenseRating(team) {
-  return Math.round(
-    team.ppg * 0.4 +
-      team.apg * 1.2 +
-      team.fg_pct * 0.6 +
-      team.three_pt_pct * 0.5,
-  );
+  return Math.round(team.offstat || 0);
 }
 
 function defenseRating(team) {
-  return Math.round(team.rpg * 0.5 + team.spg * 2 + team.bpg * 2 + 35);
+  return Math.round(team.defstat || 0);
 }
 
 function controlRating(team) {
