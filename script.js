@@ -1,7 +1,6 @@
 let teams = [];
 let selectedTeamA = null;
 let selectedTeamB = null;
-let currentPage = "dashboard";
 let searchTerm = "";
 let favoriteTeamIds = JSON.parse(
   localStorage.getItem("favoriteTeamIds") || "[]",
@@ -48,9 +47,7 @@ async function loadTeams() {
     document.getElementById("teamGrid").innerHTML = `
       <div class="card">
         <div class="panel-title">Data could not be loaded</div>
-        <div class="muted">
-          Make sure your file is named data.json and you are opening the project with Live Server.
-        </div>
+        <div class="muted">Make sure your file is named data.json and you are using Live Server.</div>
       </div>
     `;
   }
@@ -300,7 +297,7 @@ function generateStrategies(a, b) {
       a.name,
       "Offense",
       "Create perimeter looks",
-      `${a.name} has the stronger three-point shooting profile. Use drive-and-kick actions and extra passing to generate open shots.`,
+      `${a.name} has the stronger three-point shooting profile. Use drive-and-kick actions, extra passing, and early spacing to generate clean shots.`,
     );
   } else if (b.three_pt_pct > a.three_pt_pct) {
     pushStrategy(
@@ -309,7 +306,7 @@ function generateStrategies(a, b) {
       b.name,
       "Offense",
       "Create perimeter looks",
-      `${b.name} has the stronger three-point shooting profile. Use drive-and-kick actions and extra passing to generate open shots.`,
+      `${b.name} has the stronger three-point shooting profile. Use drive-and-kick actions, extra passing, and early spacing to generate clean shots.`,
     );
   }
 
@@ -320,7 +317,7 @@ function generateStrategies(a, b) {
       a.name,
       "Rebounding",
       "Control the glass",
-      `${a.name} has the rebounding edge. Attack second-chance opportunities and limit extra possessions.`,
+      `${a.name} has the rebounding edge. Prioritize second-chance opportunities and limit extra possessions for ${b.name}.`,
     );
   } else if (b.rpg > a.rpg) {
     pushStrategy(
@@ -329,7 +326,7 @@ function generateStrategies(a, b) {
       b.name,
       "Rebounding",
       "Control the glass",
-      `${b.name} has the rebounding edge. Attack second-chance opportunities and limit extra possessions.`,
+      `${b.name} has the rebounding edge. Prioritize second-chance opportunities and limit extra possessions for ${a.name}.`,
     );
   }
 
@@ -340,7 +337,7 @@ function generateStrategies(a, b) {
       b.name,
       "Composure",
       "Limit scoring runs",
-      `${a.name} has the stronger scoring margin. ${b.name} needs disciplined possessions and transition defense.`,
+      `${a.name} has the stronger scoring margin. ${b.name} needs disciplined possessions, transition defense, and fewer empty trips.`,
     );
   } else if (b.plus_minus > a.plus_minus) {
     pushStrategy(
@@ -349,7 +346,7 @@ function generateStrategies(a, b) {
       a.name,
       "Composure",
       "Limit scoring runs",
-      `${b.name} has the stronger scoring margin. ${a.name} needs disciplined possessions and transition defense.`,
+      `${b.name} has the stronger scoring margin. ${a.name} needs disciplined possessions, transition defense, and fewer empty trips.`,
     );
   }
 
@@ -359,8 +356,8 @@ function generateStrategies(a, b) {
       "B",
       b.name,
       "Shot Selection",
-      "Avoid forcing rim attempts",
-      `${a.name} protects the rim better. ${b.name} should use spacing, kick-outs, and pull-ups.`,
+      "Avoid forced rim attempts",
+      `${a.name} protects the rim better. ${b.name} should use spacing, kick-outs, and pull-ups instead of forcing contested finishes.`,
     );
   } else if (b.bpg > a.bpg) {
     pushStrategy(
@@ -368,8 +365,8 @@ function generateStrategies(a, b) {
       "A",
       a.name,
       "Shot Selection",
-      "Avoid forcing rim attempts",
-      `${b.name} protects the rim better. ${a.name} should use spacing, kick-outs, and pull-ups.`,
+      "Avoid forced rim attempts",
+      `${b.name} protects the rim better. ${a.name} should use spacing, kick-outs, and pull-ups instead of forcing contested finishes.`,
     );
   }
 
@@ -379,8 +376,8 @@ function generateStrategies(a, b) {
       "A",
       a.name,
       "General",
-      "Play a balanced game",
-      "This matchup is statistically close. Focus on execution, transition defense, and limiting empty possessions.",
+      "Win the possession battle",
+      "This matchup is statistically close. Focus on execution, transition defense, rebounding, and limiting turnovers.",
     );
   }
 
@@ -432,16 +429,16 @@ function renderRadar(a, b) {
   ];
 
   return `
-    <div class="card">
-      <div class="panel-title">Radar Chart</div>
+    <div class="card pro-card">
+      <div class="panel-title">Skill Profile</div>
       <div class="radar-wrap">
         <svg width="400" height="340" viewBox="0 0 400 340">
           <polygon points="200,50 312,110 312,230 200,290 88,230 88,110" fill="none" stroke="#334155"/>
           <polygon points="200,90 276,130 276,210 200,250 124,210 124,130" fill="none" stroke="#334155"/>
           <polygon points="200,130 240,150 240,190 200,210 160,190 160,150" fill="none" stroke="#334155"/>
 
-          <polygon points="${radarPoints(aValues, 200, 170, 120)}" fill="rgba(249,115,22,0.28)" stroke="#f97316" stroke-width="2"/>
-          <polygon points="${radarPoints(bValues, 200, 170, 120)}" fill="rgba(148,163,184,0.24)" stroke="#94a3b8" stroke-width="2"/>
+          <polygon points="${radarPoints(aValues, 200, 170, 120)}" fill="rgba(226,232,240,0.25)" stroke="#e2e8f0" stroke-width="2"/>
+          <polygon points="${radarPoints(bValues, 200, 170, 120)}" fill="rgba(100,116,139,0.24)" stroke="#64748b" stroke-width="2"/>
 
           ${labels.map(([text, x, y]) => `<text x="${x}" y="${y}" text-anchor="middle">${text}</text>`).join("")}
         </svg>
@@ -457,7 +454,7 @@ function renderComparison() {
     container.innerHTML = `
       <div class="card">
         <div class="panel-title">No matchup selected</div>
-        <div class="muted">Select two different teams from the dashboard first.</div>
+        <div class="muted">Select two teams from the dashboard first.</div>
       </div>
     `;
     return;
@@ -477,43 +474,69 @@ function renderComparison() {
   ];
 
   container.innerHTML = `
+    <div class="matchup-hero">
+      <div class="matchup-team-card">
+        <div class="eyebrow">Team A</div>
+        <div class="team-name">${a.name}</div>
+        <div class="team-conf">${a.conference} • ${a.region}</div>
+
+        <div class="hero-stats">
+          <div>
+            <span>Offense</span>
+            <strong>${offenseRating(a)}</strong>
+          </div>
+          <div>
+            <span>Defense</span>
+            <strong>${defenseRating(a)}</strong>
+          </div>
+        </div>
+      </div>
+
+      <div class="matchup-center">
+        <div class="vs-pill">VS</div>
+        <div class="muted small">Professional matchup breakdown</div>
+      </div>
+
+      <div class="matchup-team-card opponent">
+        <div class="eyebrow">Team B</div>
+        <div class="team-name">${b.name}</div>
+        <div class="team-conf">${b.conference} • ${b.region}</div>
+
+        <div class="hero-stats">
+          <div>
+            <span>Offense</span>
+            <strong>${offenseRating(b)}</strong>
+          </div>
+          <div>
+            <span>Defense</span>
+            <strong>${defenseRating(b)}</strong>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <div class="comparison-layout">
       <div>
-        <div class="card">
-          <div class="panel-title">Head-to-Head Comparison</div>
-
-          <div class="compare-head">
-            <div class="mini-team">
-              <div class="team-tag team-a">Team A</div>
-              <div class="team-name">${a.name}</div>
-              <div class="team-conf">${a.conference} • ${a.region}</div>
-              <div>Offense: <strong>${offenseRating(a)}</strong></div>
-              <div>Defense: <strong>${defenseRating(a)}</strong></div>
-            </div>
-
-            <div class="vs">VS</div>
-
-            <div class="mini-team">
-              <div class="team-tag team-b">Team B</div>
-              <div class="team-name">${b.name}</div>
-              <div class="team-conf">${b.conference} • ${b.region}</div>
-              <div>Offense: <strong>${offenseRating(b)}</strong></div>
-              <div>Defense: <strong>${defenseRating(b)}</strong></div>
-            </div>
-          </div>
+        <div class="card pro-card">
+          <div class="panel-title">Statistical Profile</div>
 
           ${bars
             .map(
               ([label, av, bv, max]) => `
-            <div class="bar-row">
-              <div class="bar-label">
+            <div class="pro-row">
+              <div class="pro-row-top">
                 <span>${label}</span>
-                <span>${a.name}: ${av} | ${b.name}: ${bv}</span>
+                <span>${a.name}: ${av} / ${b.name}: ${bv}</span>
               </div>
 
-              <div class="bar-track">
-                <div class="bar-fill-a" style="width:${Math.min(100, (av / max) * 100)}%"></div>
-                <div class="bar-fill-b" style="width:${Math.min(100, (bv / max) * 100)}%"></div>
+              <div class="pro-bars">
+                <div class="pro-bar">
+                  <div style="width:${Math.min(100, (av / max) * 100)}%"></div>
+                </div>
+
+                <div class="pro-bar muted-bar">
+                  <div style="width:${Math.min(100, (bv / max) * 100)}%"></div>
+                </div>
               </div>
             </div>
           `,
@@ -525,13 +548,14 @@ function renderComparison() {
       </div>
 
       <div>
-        <div class="card">
-          <div class="panel-title">Strategy Recommendations</div>
+        <div class="card pro-card">
+          <div class="panel-title">Game Plan</div>
+
           <div class="strategy-list">
             ${strategies
               .map(
                 (s) => `
-              <div class="strategy-item ${s.team === "A" ? "team-a" : "team-b"}">
+              <div class="strategy-item neutral">
                 <div class="strategy-type">${s.teamName} • ${s.type}</div>
                 <div class="strategy-title">${s.title}</div>
                 <div>${s.text}</div>
@@ -547,8 +571,6 @@ function renderComparison() {
 }
 
 function showPage(page) {
-  currentPage = page;
-
   document
     .getElementById("dashboardPage")
     .classList.toggle("hidden", page !== "dashboard");
