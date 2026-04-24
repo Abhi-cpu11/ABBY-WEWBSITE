@@ -3,29 +3,71 @@ let selectedTeamA = null;
 let selectedTeamB = null;
 let currentPage = "dashboard";
 let searchTerm = "";
-let favoriteTeamIds = JSON.parse(localStorage.getItem("favoriteTeamIds") || "[]");
+let favoriteTeamIds = JSON.parse(
+  localStorage.getItem("favoriteTeamIds") || "[]",
+);
 
 async function loadTeams() {
   try {
     const response = await fetch("./data.json");
+
     if (!response.ok) {
       throw new Error("Could not load team data.");
     }
 
     const data = await response.json();
-    teams = data.teams || [];
+    const regions = data.ncaa_d1_basketball_stats?.conference || [];
+
+    teams = regions.flatMap((region) =>
+      (region.team || []).map((team) => ({
+        id: makeId(team.name),
+        name: team.name || "Unknown Team",
+        region: region._name || "Unknown",
+        conference: team.conference || team._conference || "Unknown",
+
+        ppg: toNumber(team.ppg),
+        rpg: toNumber(team.rpg),
+        apg: toNumber(team.apg),
+        bpg: toNumber(team.bpg),
+        spg: toNumber(team.spg),
+        plus_minus: toNumber(team.plus_minus),
+        fg_pct: toNumber(team.fg_pct),
+        three_pt_pct: toNumber(team.three_pt_pct),
+        ft_pct: toNumber(team.ft_pct),
+        ts_pct: toNumber(team.ts_pct),
+
+        image: team.image || "",
+        color: "#f97316",
+      })),
+    );
+
     renderTeams();
   } catch (error) {
     console.error(error);
+
     document.getElementById("teamGrid").innerHTML = `
       <div class="card">
         <div class="panel-title">Data could not be loaded</div>
         <div class="muted">
-          Open this project with a local server so script.js can read data.json.
+          Make sure your file is named data.json and you are opening the project with Live Server.
         </div>
       </div>
     `;
   }
+}
+
+function toNumber(value) {
+  return Number(String(value || "0").replace("+", ""));
+}
+
+function makeId(name) {
+  return String(name || "")
+    .toLowerCase()
+    .replaceAll("&", "and")
+    .replaceAll("(", "")
+    .replaceAll(")", "")
+    .replaceAll(".", "")
+    .replaceAll(" ", "-");
 }
 
 function saveFavorites() {
@@ -38,7 +80,7 @@ function isFavorite(teamId) {
 
 function toggleFavorite(teamId) {
   if (isFavorite(teamId)) {
-    favoriteTeamIds = favoriteTeamIds.filter(id => id !== teamId);
+    favoriteTeamIds = favoriteTeamIds.filter((id) => id !== teamId);
   } else {
     favoriteTeamIds.push(teamId);
   }
@@ -48,19 +90,26 @@ function toggleFavorite(teamId) {
 }
 
 function offenseRating(team) {
-  return Math.round((team.ppg * 0.4) + (team.apg * 1.2) + (team.fg_pct * 0.6) + (team.three_pt_pct * 0.5));
+  return Math.round(
+    team.ppg * 0.4 +
+      team.apg * 1.2 +
+      team.fg_pct * 0.6 +
+      team.three_pt_pct * 0.5,
+  );
 }
 
 function defenseRating(team) {
-  return Math.round((team.rpg * 0.5) + (team.spg * 2) + (team.bpg * 2) - (team.plus_minus * -0.1) + 35);
+  return Math.round(team.rpg * 0.5 + team.spg * 2 + team.bpg * 2 + 35);
 }
 
 function controlRating(team) {
-  return Math.round((team.apg * 1.5) - (team.spg * 0.2) + (team.ft_pct * 0.2) + 35);
+  return Math.round(team.apg * 1.5 - team.spg * 0.2 + team.ft_pct * 0.2 + 35);
 }
 
 function shootingRating(team) {
-  return Math.round((team.fg_pct * 0.6) + (team.three_pt_pct * 0.7) + (team.ts_pct * 0.3));
+  return Math.round(
+    team.fg_pct * 0.6 + team.three_pt_pct * 0.7 + team.ts_pct * 0.3,
+  );
 }
 
 function updateMatchupBar() {
@@ -73,8 +122,12 @@ function updateMatchupBar() {
   if (selectedTeamA || selectedTeamB) {
     matchupBar.classList.remove("hidden");
 
-    matchupTeamA.textContent = selectedTeamA ? selectedTeamA.name : "Select Team";
-    matchupTeamB.textContent = selectedTeamB ? selectedTeamB.name : "Select Team";
+    matchupTeamA.textContent = selectedTeamA
+      ? selectedTeamA.name
+      : "Select Team";
+    matchupTeamB.textContent = selectedTeamB
+      ? selectedTeamB.name
+      : "Select Team";
 
     if (selectedTeamA && selectedTeamB) {
       matchupSub.textContent = "Ready for analysis";
@@ -95,10 +148,11 @@ function getFilteredTeams() {
   let filtered = teams;
 
   if (normalized) {
-    filtered = teams.filter(team =>
-      team.name.toLowerCase().includes(normalized) ||
-      team.conference.toLowerCase().includes(normalized) ||
-      team.region.toLowerCase().includes(normalized)
+    filtered = teams.filter(
+      (team) =>
+        team.name.toLowerCase().includes(normalized) ||
+        team.conference.toLowerCase().includes(normalized) ||
+        team.region.toLowerCase().includes(normalized),
     );
   }
 
@@ -117,6 +171,7 @@ function getFilteredTeams() {
 function renderTeams() {
   const grid = document.getElementById("teamGrid");
   const filteredTeams = getFilteredTeams();
+
   grid.innerHTML = "";
 
   if (filteredTeams.length === 0) {
@@ -130,33 +185,29 @@ function renderTeams() {
     return;
   }
 
-  filteredTeams.forEach(team => {
+  filteredTeams.forEach((team) => {
     const isSelectedA = selectedTeamA && selectedTeamA.id === team.id;
     const isSelectedB = selectedTeamB && selectedTeamB.id === team.id;
     const isSelected = isSelectedA || isSelectedB;
-    const slotLabel = isSelectedA ? "Team A Selected" : isSelectedB ? "Team B Selected" : "Select Team";
-    const otherSelectedTeamId = isSelectedA
-      ? selectedTeamB?.id
-      : isSelectedB
-        ? selectedTeamA?.id
-        : (selectedTeamA?.id || selectedTeamB?.id);
 
-    const isBlockedDuplicate = otherSelectedTeamId === team.id && !isSelected;
-    const note = isBlockedDuplicate
-      ? `<div class="selection-note">You cannot compare the same team against itself.</div>`
-      : "";
+    const slotLabel = isSelectedA
+      ? "Team A Selected"
+      : isSelectedB
+        ? "Team B Selected"
+        : "Select Team";
 
     const card = document.createElement("div");
     card.className = "card";
 
     card.innerHTML = `
-      <div class="team-color" style="background:${team.color}"></div>
+      <div class="team-color"></div>
 
       <div class="team-header">
         <div>
           <div class="team-name">${team.name}</div>
           <div class="team-conf">${team.conference} • ${team.region}</div>
         </div>
+
         <button class="favorite-btn" aria-label="Toggle favorite">
           ${isFavorite(team.id) ? "★" : "☆"}
         </button>
@@ -181,10 +232,9 @@ function renderTeams() {
         </div>
       </div>
 
-      <button class="select-btn ${isSelected ? "selected" : ""}" ${isBlockedDuplicate ? "disabled" : ""}>
+      <button class="select-btn ${isSelected ? "selected" : ""}">
         ${slotLabel}
       </button>
-      ${note}
     `;
 
     card.querySelector(".select-btn").onclick = () => selectTeam(team);
@@ -220,19 +270,13 @@ function selectTeam(team) {
   }
 
   if (!selectedTeamB) {
-    if (selectedTeamA.id === team.id) {
-      return;
-    }
     selectedTeamB = team;
     renderTeams();
     return;
   }
 
-  if (selectedTeamA.id !== team.id) {
-    selectedTeamA = team;
-  }
+  selectedTeamA = team;
   selectedTeamB = null;
-
   renderTeams();
 }
 
@@ -242,7 +286,7 @@ function pushStrategy(strategies, teamKey, teamName, type, title, text) {
     teamName,
     type,
     title,
-    text
+    text,
   });
 }
 
@@ -256,7 +300,7 @@ function generateStrategies(a, b) {
       a.name,
       "Offense",
       "Create perimeter looks",
-      `${a.name} has the stronger three-point shooting profile. Use drive-and-kick actions and extra passing to generate open perimeter shots.`
+      `${a.name} has the stronger three-point shooting profile. Use drive-and-kick actions and extra passing to generate open shots.`,
     );
   } else if (b.three_pt_pct > a.three_pt_pct) {
     pushStrategy(
@@ -265,47 +309,7 @@ function generateStrategies(a, b) {
       b.name,
       "Offense",
       "Create perimeter looks",
-      `${b.name} has the stronger three-point shooting profile. Use drive-and-kick actions and extra passing to generate open perimeter shots.`
-    );
-  }
-
-  if (a.bpg < b.bpg) {
-    pushStrategy(
-      strategies,
-      "A",
-      a.name,
-      "Defense",
-      "Avoid attacking into shot blockers",
-      `${b.name} protects the rim better. Use ball movement, mid-range pull-ups, and kick-outs instead of forcing contested finishes inside.`
-    );
-  } else if (b.bpg < a.bpg) {
-    pushStrategy(
-      strategies,
-      "B",
-      b.name,
-      "Defense",
-      "Avoid attacking into shot blockers",
-      `${a.name} protects the rim better. Use ball movement, mid-range pull-ups, and kick-outs instead of forcing contested finishes inside.`
-    );
-  }
-
-  if (a.plus_minus < b.plus_minus) {
-    pushStrategy(
-      strategies,
-      "A",
-      a.name,
-      "Composure",
-      "Control momentum swings",
-      `${b.name} carries the stronger scoring margin. ${a.name} should value possessions and slow scoring runs with disciplined half-court execution.`
-    );
-  } else if (b.plus_minus < a.plus_minus) {
-    pushStrategy(
-      strategies,
-      "B",
-      b.name,
-      "Composure",
-      "Control momentum swings",
-      `${a.name} carries the stronger scoring margin. ${b.name} should value possessions and slow scoring runs with disciplined half-court execution.`
+      `${b.name} has the stronger three-point shooting profile. Use drive-and-kick actions and extra passing to generate open shots.`,
     );
   }
 
@@ -315,8 +319,8 @@ function generateStrategies(a, b) {
       "A",
       a.name,
       "Rebounding",
-      "Crash the glass",
-      `${a.name} has a rebounding edge. Attack second-chance points and make offensive rebounding part of the game plan.`
+      "Control the glass",
+      `${a.name} has the rebounding edge. Attack second-chance opportunities and limit extra possessions.`,
     );
   } else if (b.rpg > a.rpg) {
     pushStrategy(
@@ -324,8 +328,48 @@ function generateStrategies(a, b) {
       "B",
       b.name,
       "Rebounding",
-      "Crash the glass",
-      `${b.name} has a rebounding edge. Attack second-chance points and make offensive rebounding part of the game plan.`
+      "Control the glass",
+      `${b.name} has the rebounding edge. Attack second-chance opportunities and limit extra possessions.`,
+    );
+  }
+
+  if (a.plus_minus > b.plus_minus) {
+    pushStrategy(
+      strategies,
+      "B",
+      b.name,
+      "Composure",
+      "Limit scoring runs",
+      `${a.name} has the stronger scoring margin. ${b.name} needs disciplined possessions and transition defense.`,
+    );
+  } else if (b.plus_minus > a.plus_minus) {
+    pushStrategy(
+      strategies,
+      "A",
+      a.name,
+      "Composure",
+      "Limit scoring runs",
+      `${b.name} has the stronger scoring margin. ${a.name} needs disciplined possessions and transition defense.`,
+    );
+  }
+
+  if (a.bpg > b.bpg) {
+    pushStrategy(
+      strategies,
+      "B",
+      b.name,
+      "Shot Selection",
+      "Avoid forcing rim attempts",
+      `${a.name} protects the rim better. ${b.name} should use spacing, kick-outs, and pull-ups.`,
+    );
+  } else if (b.bpg > a.bpg) {
+    pushStrategy(
+      strategies,
+      "A",
+      a.name,
+      "Shot Selection",
+      "Avoid forcing rim attempts",
+      `${b.name} protects the rim better. ${a.name} should use spacing, kick-outs, and pull-ups.`,
     );
   }
 
@@ -336,15 +380,7 @@ function generateStrategies(a, b) {
       a.name,
       "General",
       "Play a balanced game",
-      "This matchup is statistically close. Focus on execution, transition defense, and limiting empty possessions."
-    );
-    pushStrategy(
-      strategies,
-      "B",
-      b.name,
-      "General",
-      "Play a balanced game",
-      "This matchup is statistically close. Focus on execution, transition defense, and limiting empty possessions."
+      "This matchup is statistically close. Focus on execution, transition defense, and limiting empty possessions.",
     );
   }
 
@@ -353,13 +389,18 @@ function generateStrategies(a, b) {
 
 function radarPoints(values, cx, cy, radius) {
   const labels = values.length;
-  return values.map((value, i) => {
-    const angle = (-Math.PI / 2) + ((2 * Math.PI * i) / labels);
-    const r = radius * (value / 100);
-    const x = cx + Math.cos(angle) * r;
-    const y = cy + Math.sin(angle) * r;
-    return `${x},${y}`;
-  }).join(" ");
+
+  return values
+    .map((value, i) => {
+      const angle = -Math.PI / 2 + (2 * Math.PI * i) / labels;
+      const safeValue = Math.max(0, Math.min(100, value));
+      const r = radius * (safeValue / 100);
+      const x = cx + Math.cos(angle) * r;
+      const y = cy + Math.sin(angle) * r;
+
+      return `${x},${y}`;
+    })
+    .join(" ");
 }
 
 function renderRadar(a, b) {
@@ -369,7 +410,7 @@ function renderRadar(a, b) {
     shootingRating(a),
     Math.min(100, a.rpg * 2),
     Math.min(100, controlRating(a)),
-    Math.min(100, a.ppg)
+    Math.min(100, a.ppg),
   ];
 
   const bValues = [
@@ -378,7 +419,7 @@ function renderRadar(a, b) {
     shootingRating(b),
     Math.min(100, b.rpg * 2),
     Math.min(100, controlRating(b)),
-    Math.min(100, b.ppg)
+    Math.min(100, b.ppg),
   ];
 
   const labels = [
@@ -387,7 +428,7 @@ function renderRadar(a, b) {
     ["Shooting", 335, 245],
     ["Rebounding", 200, 320],
     ["Control", 55, 245],
-    ["Tempo", 55, 95]
+    ["Tempo", 55, 95],
   ];
 
   return `
@@ -398,8 +439,10 @@ function renderRadar(a, b) {
           <polygon points="200,50 312,110 312,230 200,290 88,230 88,110" fill="none" stroke="#334155"/>
           <polygon points="200,90 276,130 276,210 200,250 124,210 124,130" fill="none" stroke="#334155"/>
           <polygon points="200,130 240,150 240,190 200,210 160,190 160,150" fill="none" stroke="#334155"/>
-          <polygon points="${radarPoints(aValues, 200, 170, 120)}" fill="rgba(249,115,22,0.35)" stroke="#f97316" stroke-width="2"/>
-          <polygon points="${radarPoints(bValues, 200, 170, 120)}" fill="rgba(56,189,248,0.30)" stroke="#38bdf8" stroke-width="2"/>
+
+          <polygon points="${radarPoints(aValues, 200, 170, 120)}" fill="rgba(249,115,22,0.28)" stroke="#f97316" stroke-width="2"/>
+          <polygon points="${radarPoints(bValues, 200, 170, 120)}" fill="rgba(148,163,184,0.24)" stroke="#94a3b8" stroke-width="2"/>
+
           ${labels.map(([text, x, y]) => `<text x="${x}" y="${y}" text-anchor="middle">${text}</text>`).join("")}
         </svg>
       </div>
@@ -420,16 +463,6 @@ function renderComparison() {
     return;
   }
 
-  if (selectedTeamA.id === selectedTeamB.id) {
-    container.innerHTML = `
-      <div class="card">
-        <div class="panel-title">Invalid matchup</div>
-        <div class="muted">You cannot compare the same team against itself.</div>
-      </div>
-    `;
-    return;
-  }
-
   const a = selectedTeamA;
   const b = selectedTeamB;
   const strategies = generateStrategies(a, b);
@@ -440,7 +473,7 @@ function renderComparison() {
     ["3P%", a.three_pt_pct, b.three_pt_pct, 100],
     ["REB", a.rpg, b.rpg, 60],
     ["APG", a.apg, b.apg, 30],
-    ["TS%", a.ts_pct, b.ts_pct, 100]
+    ["TS%", a.ts_pct, b.ts_pct, 100],
   ];
 
   container.innerHTML = `
@@ -448,6 +481,7 @@ function renderComparison() {
       <div>
         <div class="card">
           <div class="panel-title">Head-to-Head Comparison</div>
+
           <div class="compare-head">
             <div class="mini-team">
               <div class="team-tag team-a">Team A</div>
@@ -456,7 +490,9 @@ function renderComparison() {
               <div>Offense: <strong>${offenseRating(a)}</strong></div>
               <div>Defense: <strong>${defenseRating(a)}</strong></div>
             </div>
+
             <div class="vs">VS</div>
+
             <div class="mini-team">
               <div class="team-tag team-b">Team B</div>
               <div class="team-name">${b.name}</div>
@@ -466,18 +502,23 @@ function renderComparison() {
             </div>
           </div>
 
-          ${bars.map(([label, av, bv, max]) => `
+          ${bars
+            .map(
+              ([label, av, bv, max]) => `
             <div class="bar-row">
               <div class="bar-label">
                 <span>${label}</span>
                 <span>${a.name}: ${av} | ${b.name}: ${bv}</span>
               </div>
+
               <div class="bar-track">
-                <div class="bar-fill-a" style="width:${(av / max) * 100}%"></div>
-                <div class="bar-fill-b" style="width:${(bv / max) * 100}%"></div>
+                <div class="bar-fill-a" style="width:${Math.min(100, (av / max) * 100)}%"></div>
+                <div class="bar-fill-b" style="width:${Math.min(100, (bv / max) * 100)}%"></div>
               </div>
             </div>
-          `).join("")}
+          `,
+            )
+            .join("")}
         </div>
 
         ${renderRadar(a, b)}
@@ -487,13 +528,17 @@ function renderComparison() {
         <div class="card">
           <div class="panel-title">Strategy Recommendations</div>
           <div class="strategy-list">
-            ${strategies.map(s => `
+            ${strategies
+              .map(
+                (s) => `
               <div class="strategy-item ${s.team === "A" ? "team-a" : "team-b"}">
                 <div class="strategy-type">${s.teamName} • ${s.type}</div>
                 <div class="strategy-title">${s.title}</div>
                 <div>${s.text}</div>
               </div>
-            `).join("")}
+            `,
+              )
+              .join("")}
           </div>
         </div>
       </div>
@@ -503,11 +548,16 @@ function renderComparison() {
 
 function showPage(page) {
   currentPage = page;
-  document.getElementById("dashboardPage").classList.toggle("hidden", page !== "dashboard");
-  document.getElementById("comparisonPage").classList.toggle("hidden", page !== "comparison");
+
+  document
+    .getElementById("dashboardPage")
+    .classList.toggle("hidden", page !== "dashboard");
+  document
+    .getElementById("comparisonPage")
+    .classList.toggle("hidden", page !== "comparison");
 
   const buttons = document.querySelectorAll(".nav button");
-  buttons.forEach(btn => btn.classList.remove("active"));
+  buttons.forEach((btn) => btn.classList.remove("active"));
 
   if (page === "dashboard") buttons[0].classList.add("active");
   if (page === "comparison") buttons[1].classList.add("active");
@@ -518,13 +568,18 @@ function showPage(page) {
 }
 
 function goToComparison() {
-  if (!selectedTeamA || !selectedTeamB || selectedTeamA.id === selectedTeamB.id) {
+  if (
+    !selectedTeamA ||
+    !selectedTeamB ||
+    selectedTeamA.id === selectedTeamB.id
+  ) {
     return;
   }
+
   showPage("comparison");
 }
 
-document.getElementById("teamSearch").addEventListener("input", event => {
+document.getElementById("teamSearch").addEventListener("input", (event) => {
   searchTerm = event.target.value;
   renderTeams();
 });
