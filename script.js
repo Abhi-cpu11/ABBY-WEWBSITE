@@ -294,46 +294,50 @@ function matchupEdge(a, b, stat, label) {
 // FIX: takes the team being analysed (subject) and their opponent separately
 // so tips are always relative to that specific team's weaknesses vs this opponent
 function aiRecommendations(subject, opponent) {
-  const weaknesses = [
+  const strategies = [
     {
       gap: opponent.n_fg - subject.n_fg,
-      text: `${subject.name} should take smarter shots because ${opponent.name} has better scoring efficiency.`
+      text: `${subject.name} should improve shot selection because ${opponent.name} has the scoring efficiency advantage.`
     },
     {
       gap: opponent.n_three - subject.n_three,
-      text: `${subject.name} needs tighter three-point defense because ${opponent.name} has the perimeter shooting edge.`
+      text: `${subject.name} needs tighter perimeter defense because ${opponent.name} shoots better from three.`
     },
     {
       gap: opponent.n_apg - subject.n_apg,
-      text: `${subject.name} should create more ball movement because ${opponent.name} has the playmaking advantage.`
+      text: `${subject.name} should increase ball movement to match ${opponent.name}'s playmaking ability.`
     },
     {
       gap: opponent.n_rpg - subject.n_rpg,
-      text: `${subject.name} needs to rebound harder because ${opponent.name} has the rebounding edge.`
+      text: `${subject.name} must rebound harder to stop ${opponent.name} from controlling second-chance opportunities.`
     },
     {
       gap: opponent.n_spg - subject.n_spg,
-      text: `${subject.name} should protect the ball better because ${opponent.name} creates more steals.`
+      text: `${subject.name} should protect the ball better because ${opponent.name} creates more defensive pressure.`
     },
     {
       gap: opponent.n_bpg - subject.n_bpg,
-      text: `${subject.name} should avoid forcing shots inside because ${opponent.name} has better rim protection.`
+      text: `${subject.name} should avoid forcing drives inside because ${opponent.name} protects the rim better.`
     },
     {
       gap: 45 - subject.n_ft,
-      text: `${subject.name} should improve free throws so close games do not swing away late.`
+      text: `${subject.name} should improve free throw consistency for late-game situations.`
     }
   ];
 
-  const tips = weaknesses
-    .filter(item => item.gap > 4)
+  let tips = strategies
+    .filter(item => item.gap > 3)
     .sort((a, b) => b.gap - a.gap)
     .map(item => item.text);
 
-  if (tips.length === 0) {
-    return [
-      `${subject.name} matches up well with ${opponent.name}, so focus on execution, pace control, and limiting mistakes.`
-    ];
+  const backupTips = [
+    `${subject.name} should control the pace and avoid letting ${opponent.name} speed the game up.`,
+    `${subject.name} should focus on transition defense and communication.`,
+    `${subject.name} should minimize turnovers and force ${opponent.name} into half-court offense.`
+  ];
+
+  while (tips.length < 3) {
+    tips.push(backupTips[tips.length % backupTips.length]);
   }
 
   return tips.slice(0, 3);

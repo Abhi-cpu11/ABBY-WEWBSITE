@@ -786,6 +786,10 @@ svg text {
   gap: 8px;
 }
 
+.focus-panel.hidden {
+  display: none;
+}
+
 .focus-item {
   padding: 11px 14px;
   background: rgba(2, 6, 23, 0.38);
