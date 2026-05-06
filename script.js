@@ -9,10 +9,7 @@ let favoriteTeamIds = JSON.parse(
 async function loadTeams() {
   try {
     const response = await fetch("./data.json");
-
-    if (!response.ok) {
-      throw new Error("Could not load team data.");
-    }
+    if (!response.ok) throw new Error("Could not load team data.");
 
     const data = await response.json();
     const regions = data.ncaa_d1_basketball_stats?.conference || [];
@@ -23,7 +20,6 @@ async function loadTeams() {
         name: team.name || "Unknown Team",
         region: region._name || "Unknown",
         conference: team.conference || team._conference || "Unknown",
-
         ppg: toNumber(team.ppg),
         rpg: toNumber(team.rpg),
         apg: toNumber(team.apg),
@@ -36,16 +32,13 @@ async function loadTeams() {
         ts_pct: toNumber(team.ts_pct),
         offstat: toNumber(team.offstat),
         defstat: toNumber(team.defstat),
-
         image: team.image || "",
-        color: "#f97316",
       })),
     );
 
     renderTeams();
   } catch (error) {
     console.error(error);
-
     document.getElementById("teamGrid").innerHTML = `
       <div class="card">
         <div class="panel-title">Data could not be loaded</div>
@@ -87,30 +80,38 @@ function toggleFavorite(teamId) {
   renderTeams();
 }
 
+// Offense rating uses offstat from data.json directly
 function offenseRating(team) {
   return Math.round(team.offstat || 0);
 }
 
+// Defense rating uses defstat from data.json directly
 function defenseRating(team) {
   return Math.round(team.defstat || 0);
 }
 
+// Control = blend of assists, steals, and free throw % — measures ball control
 function controlRating(team) {
   return Math.round(team.apg * 1.5 - team.spg * 0.2 + team.ft_pct * 0.2 + 35);
 }
 
+// Shooting = weighted blend of FG%, 3P%, and TS%
 function shootingRating(team) {
-  return Math.round(
-    team.fg_pct * 0.6 + team.three_pt_pct * 0.7 + team.ts_pct * 0.3,
-  );
+  return Math.round(team.fg_pct * 0.6 + team.three_pt_pct * 0.7 + team.ts_pct * 0.3);
+}
+
+// Tempo = PPG used as a pace proxy (more points = faster pace)
+// The JSON has no raw possession count, so PPG is the best available estimate
+function tempoRating(team) {
+  return Math.min(100, team.ppg);
 }
 
 function updateMatchupBar() {
-  const matchupBar  = document.getElementById("matchupBar");
+  const matchupBar   = document.getElementById("matchupBar");
   const matchupTeamA = document.getElementById("matchupTeamA");
   const matchupTeamB = document.getElementById("matchupTeamB");
-  const matchupSub  = document.getElementById("matchupSub");
-  const analyzeBtn  = document.getElementById("analyzeBtn");
+  const matchupSub   = document.getElementById("matchupSub");
+  const analyzeBtn   = document.getElementById("analyzeBtn");
 
   if (selectedTeamA || selectedTeamB) {
     matchupBar.classList.remove("hidden");
@@ -135,11 +136,10 @@ function getFilteredTeams() {
   let filtered = teams;
 
   if (normalized) {
-    filtered = teams.filter(
-      (team) =>
-        team.name.toLowerCase().includes(normalized) ||
-        team.conference.toLowerCase().includes(normalized) ||
-        team.region.toLowerCase().includes(normalized),
+    filtered = teams.filter((team) =>
+      team.name.toLowerCase().includes(normalized) ||
+      team.conference.toLowerCase().includes(normalized) ||
+      team.region.toLowerCase().includes(normalized),
     );
   }
 
@@ -154,7 +154,6 @@ function getFilteredTeams() {
 function renderTeams() {
   const grid = document.getElementById("teamGrid");
   const filteredTeams = getFilteredTeams();
-
   grid.innerHTML = "";
 
   if (filteredTeams.length === 0) {
@@ -181,7 +180,6 @@ function renderTeams() {
 
     const card = document.createElement("div");
     card.className = "card";
-
     card.innerHTML = `
       <div class="team-color"></div>
       <div class="team-header">
@@ -238,9 +236,11 @@ function selectTeam(team) {
   renderTeams();
 }
 
-// --------------------------------------------------
-// TEAM COMPARER (by Valentino Simeonidis)
-// --------------------------------------------------
+// ==================================================
+// TEAM COMPARER — by Valentino Simeonidis (759743)
+// Powers the win probability, power ratings,
+// matchup breakdown, and competitive focus tips
+// ==================================================
 
 function num(val) { return parseFloat(val) || 0; }
 function clamp(value, min, max) { return Math.max(min, Math.min(max, value)); }
@@ -255,8 +255,14 @@ function balanceScore(team) {
 }
 
 function normalizeTeam(t) {
-  const fg = num(t.fg_pct), three = num(t.three_pt_pct), ft = num(t.ft_pct);
-  const ppg = num(t.ppg), apg = num(t.apg), rpg = num(t.rpg), spg = num(t.spg), bpg = num(t.bpg);
+  const fg    = num(t.fg_pct);
+  const three = num(t.three_pt_pct);
+  const ft    = num(t.ft_pct);
+  const ppg   = num(t.ppg);
+  const apg   = num(t.apg);
+  const rpg   = num(t.rpg);
+  const spg   = num(t.spg);
+  const bpg   = num(t.bpg);
 
   const n_fg    = normalize(fg,    40, 55);
   const n_three = normalize(three, 28, 42);
@@ -285,19 +291,55 @@ function matchupEdge(a, b, stat, label) {
   return             { label, edge: "Strong",    winner: diff > 0 ? a.name : b.name };
 }
 
-function aiRecommendations(team, opponent) {
-  const tips = [];
-  if (team.n_fg    < opponent.n_fg)    tips.push("Improve shot selection and scoring efficiency.");
-  if (team.n_three < opponent.n_three) tips.push("Generate more consistent perimeter offense.");
-  if (team.n_apg   < opponent.n_apg)   tips.push("Increase ball movement and passing flow.");
-  if (team.n_rpg   < opponent.n_rpg)   tips.push("Improve rebounding and second-chance prevention.");
-  if (team.n_spg   < opponent.n_spg)   tips.push("Apply stronger perimeter defensive pressure.");
-  if (team.n_ft    < 45)               tips.push("Improve free throw consistency in close games.");
-  if (tips.length === 0)               tips.push("Maintain current strengths and team balance.");
+// FIX: takes the team being analysed (subject) and their opponent separately
+// so tips are always relative to that specific team's weaknesses vs this opponent
+function aiRecommendations(subject, opponent) {
+  const weaknesses = [
+    {
+      gap: opponent.n_fg - subject.n_fg,
+      text: `${subject.name} should take smarter shots because ${opponent.name} has better scoring efficiency.`
+    },
+    {
+      gap: opponent.n_three - subject.n_three,
+      text: `${subject.name} needs tighter three-point defense because ${opponent.name} has the perimeter shooting edge.`
+    },
+    {
+      gap: opponent.n_apg - subject.n_apg,
+      text: `${subject.name} should create more ball movement because ${opponent.name} has the playmaking advantage.`
+    },
+    {
+      gap: opponent.n_rpg - subject.n_rpg,
+      text: `${subject.name} needs to rebound harder because ${opponent.name} has the rebounding edge.`
+    },
+    {
+      gap: opponent.n_spg - subject.n_spg,
+      text: `${subject.name} should protect the ball better because ${opponent.name} creates more steals.`
+    },
+    {
+      gap: opponent.n_bpg - subject.n_bpg,
+      text: `${subject.name} should avoid forcing shots inside because ${opponent.name} has better rim protection.`
+    },
+    {
+      gap: 45 - subject.n_ft,
+      text: `${subject.name} should improve free throws so close games do not swing away late.`
+    }
+  ];
+
+  const tips = weaknesses
+    .filter(item => item.gap > 4)
+    .sort((a, b) => b.gap - a.gap)
+    .map(item => item.text);
+
+  if (tips.length === 0) {
+    return [
+      `${subject.name} matches up well with ${opponent.name}, so focus on execution, pace control, and limiting mistakes.`
+    ];
+  }
+
   return tips.slice(0, 3);
 }
-
 function runComparerAnalysis(a, b) {
+  // Normalize both teams using Valentino's algorithm
   const A = normalizeTeam(a);
   const B = normalizeTeam(b);
 
@@ -330,12 +372,16 @@ function runComparerAnalysis(a, b) {
     matchupEdge(A, B, "n_bpg",   "Rim Protection"),
   ];
 
-  return { A, B, winA, winB, winner, confidence, report, recA: aiRecommendations(A, B), recB: aiRecommendations(B, A) };
+  // FIX: A's tips = A vs B, B's tips = B vs A — keeps them distinct
+  const recA = aiRecommendations(A, B);
+  const recB = aiRecommendations(B, A);
+
+  return { A, B, winA, winB, winner, confidence, report, recA, recB };
 }
 
-// --------------------------------------------------
+// ==================================================
 // RADAR CHART WITH HOVER TOOLTIPS
-// --------------------------------------------------
+// ==================================================
 
 function radarPoints(values, cx, cy, radius) {
   return values.map((value, i) => {
@@ -346,10 +392,26 @@ function radarPoints(values, cx, cy, radius) {
 }
 
 function renderRadar(a, b) {
-  const CA = "#3b82f6", CB = "#14b8a6";
+  const CA = "#3b82f6";
+  const CB = "#14b8a6";
 
-  const aValues = [offenseRating(a), defenseRating(a), shootingRating(a), Math.min(100, a.rpg * 2), Math.min(100, controlRating(a)), Math.min(100, a.ppg)];
-  const bValues = [offenseRating(b), defenseRating(b), shootingRating(b), Math.min(100, b.rpg * 2), Math.min(100, controlRating(b)), Math.min(100, b.ppg)];
+  const aValues = [
+    offenseRating(a),
+    defenseRating(a),
+    shootingRating(a),
+    Math.min(100, a.rpg * 2),
+    Math.min(100, controlRating(a)),
+    Math.min(100, tempoRating(a)),  // PPG-based tempo proxy
+  ];
+
+  const bValues = [
+    offenseRating(b),
+    defenseRating(b),
+    shootingRating(b),
+    Math.min(100, b.rpg * 2),
+    Math.min(100, controlRating(b)),
+    Math.min(100, tempoRating(b)),  // PPG-based tempo proxy
+  ];
 
   const statLabels = ["Offense", "Defense", "Shooting", "Rebounding", "Control", "Tempo"];
   const labelPos   = [[200, 18], [342, 95], [342, 252], [200, 328], [55, 252], [55, 95]];
@@ -421,21 +483,32 @@ function positionTooltip(e, tooltip) {
   tooltip.style.top  = y + "px";
 }
 
-// --------------------------------------------------
+// ==================================================
 // FOCUS TAB SWITCHER
-// --------------------------------------------------
+// FIX: querySelector inside the card so IDs are
+// always found even after re-renders
+// ==================================================
 
 function switchFocusTab(tab) {
+  const panelA = document.getElementById("focusPanelA");
+  const panelB = document.getElementById("focusPanelB");
+  const btnA   = document.getElementById("focusBtnA");
+  const btnB   = document.getElementById("focusBtnB");
+
+  // Guard: if elements don't exist yet, do nothing
+  if (!panelA || !panelB || !btnA || !btnB) return;
+
   const showA = tab === "A";
-  document.getElementById("focusPanelA").classList.toggle("hidden", !showA);
-  document.getElementById("focusPanelB").classList.toggle("hidden",  showA);
-  document.getElementById("focusBtnA").classList.toggle("tab-active",  showA);
-  document.getElementById("focusBtnB").classList.toggle("tab-active", !showA);
+
+  panelA.classList.toggle("hidden", !showA);
+  panelB.classList.toggle("hidden",  showA);
+  btnA.classList.toggle("tab-active",  showA);
+  btnB.classList.toggle("tab-active", !showA);
 }
 
-// --------------------------------------------------
+// ==================================================
 // EDGE BADGE
-// --------------------------------------------------
+// ==================================================
 
 function edgeBadge(edge, winner, nameA, CA, CB) {
   if (edge === "Even") return `<span class="edge-badge edge-even">Even</span>`;
@@ -443,9 +516,9 @@ function edgeBadge(edge, winner, nameA, CA, CB) {
   return `<span class="edge-badge" style="background:${color}20;color:${color};border-color:${color}44;">${edge} — ${winner}</span>`;
 }
 
-// --------------------------------------------------
+// ==================================================
 // RENDER COMPARISON
-// --------------------------------------------------
+// ==================================================
 
 function renderComparison() {
   const container = document.getElementById("comparisonContent");
@@ -460,8 +533,8 @@ function renderComparison() {
     return;
   }
 
-  const a = selectedTeamA;
-  const b = selectedTeamB;
+  const a  = selectedTeamA;
+  const b  = selectedTeamB;
   const CA = "#3b82f6";
   const CB = "#14b8a6";
   const ai = runComparerAnalysis(a, b);
@@ -474,6 +547,10 @@ function renderComparison() {
     ["APG", a.apg,          b.apg,          30],
     ["TS%", a.ts_pct,       b.ts_pct,       100],
   ];
+
+  // Build focus tip HTML separately so we can verify they differ
+  const focusA = ai.recA.map(r => `<div class="focus-item" style="border-left-color:${CA};">${r}</div>`).join("");
+  const focusB = ai.recB.map(r => `<div class="focus-item" style="border-left-color:${CB};">${r}</div>`).join("");
 
   container.innerHTML = `
 
@@ -508,7 +585,7 @@ function renderComparison() {
     <!-- MAIN GRID -->
     <div class="comparison-layout">
 
-      <!-- LEFT -->
+      <!-- LEFT: stat bars + radar -->
       <div>
         <div class="card pro-card">
           <div class="panel-title">Statistical Profile</div>
@@ -541,7 +618,7 @@ function renderComparison() {
         ${renderRadar(a, b)}
       </div>
 
-      <!-- RIGHT -->
+      <!-- RIGHT: AI analysis -->
       <div>
         <div class="card pro-card">
 
@@ -569,13 +646,13 @@ function renderComparison() {
                 <div class="power-name" style="color:${CA};">${a.name}</div>
                 <div class="power-line">Offense <strong>${ai.A.offense.toFixed(1)}</strong></div>
                 <div class="power-line">Defense <strong>${ai.A.defense.toFixed(1)}</strong></div>
-                <div class="power-line">Power <strong>${ai.A.power.toFixed(1)}</strong></div>
+                <div class="power-line">Power   <strong>${ai.A.power.toFixed(1)}</strong></div>
               </div>
               <div class="power-cell" style="border-color:${CB}33;">
                 <div class="power-name" style="color:${CB};">${b.name}</div>
                 <div class="power-line">Offense <strong>${ai.B.offense.toFixed(1)}</strong></div>
                 <div class="power-line">Defense <strong>${ai.B.defense.toFixed(1)}</strong></div>
-                <div class="power-line">Power <strong>${ai.B.power.toFixed(1)}</strong></div>
+                <div class="power-line">Power   <strong>${ai.B.power.toFixed(1)}</strong></div>
               </div>
             </div>
           </div>
@@ -591,21 +668,16 @@ function renderComparison() {
             `).join("")}
           </div>
 
-          <!-- COMPETITIVE FOCUS -->
+          <!-- COMPETITIVE FOCUS — tabs switch between team tips -->
           <div class="panel-title" style="margin-top:24px;">Competitive Focus</div>
           <div class="tab-bar">
-            <button id="focusBtnA" class="tab-btn tab-active" onclick="switchFocusTab('A')"
-              style="--tab-color:${CA};">${a.name}</button>
-            <button id="focusBtnB" class="tab-btn" onclick="switchFocusTab('B')"
-              style="--tab-color:${CB};">${b.name}</button>
+            <button id="focusBtnA" class="tab-btn tab-active" onclick="switchFocusTab('A')">${a.name}</button>
+            <button id="focusBtnB" class="tab-btn"            onclick="switchFocusTab('B')">${b.name}</button>
           </div>
 
-          <div id="focusPanelA" class="focus-panel">
-            ${ai.recA.map(r => `<div class="focus-item" style="border-left-color:${CA};">${r}</div>`).join("")}
-          </div>
-          <div id="focusPanelB" class="focus-panel hidden">
-            ${ai.recB.map(r => `<div class="focus-item" style="border-left-color:${CB};">${r}</div>`).join("")}
-          </div>
+          <!-- Panel A shown by default, Panel B hidden -->
+          <div id="focusPanelA" class="focus-panel">${focusA}</div>
+          <div id="focusPanelB" class="focus-panel hidden">${focusB}</div>
 
         </div>
       </div>
@@ -621,7 +693,6 @@ function showPage(page) {
 
   const buttons = document.querySelectorAll(".nav button");
   buttons.forEach((btn) => btn.classList.remove("active"));
-
   if (page === "dashboard")  buttons[0].classList.add("active");
   if (page === "comparison") buttons[1].classList.add("active");
   if (page === "comparison") renderComparison();
