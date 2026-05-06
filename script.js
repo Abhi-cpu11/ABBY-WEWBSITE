@@ -83,7 +83,6 @@ function toggleFavorite(teamId) {
   } else {
     favoriteTeamIds.push(teamId);
   }
-
   saveFavorites();
   renderTeams();
 }
@@ -107,21 +106,16 @@ function shootingRating(team) {
 }
 
 function updateMatchupBar() {
-  const matchupBar = document.getElementById("matchupBar");
+  const matchupBar  = document.getElementById("matchupBar");
   const matchupTeamA = document.getElementById("matchupTeamA");
   const matchupTeamB = document.getElementById("matchupTeamB");
-  const matchupSub = document.getElementById("matchupSub");
-  const analyzeBtn = document.getElementById("analyzeBtn");
+  const matchupSub  = document.getElementById("matchupSub");
+  const analyzeBtn  = document.getElementById("analyzeBtn");
 
   if (selectedTeamA || selectedTeamB) {
     matchupBar.classList.remove("hidden");
-
-    matchupTeamA.textContent = selectedTeamA
-      ? selectedTeamA.name
-      : "Select Team";
-    matchupTeamB.textContent = selectedTeamB
-      ? selectedTeamB.name
-      : "Select Team";
+    matchupTeamA.textContent = selectedTeamA ? selectedTeamA.name : "Select Team";
+    matchupTeamB.textContent = selectedTeamB ? selectedTeamB.name : "Select Team";
 
     if (selectedTeamA && selectedTeamB) {
       matchupSub.textContent = "Ready for analysis";
@@ -138,7 +132,6 @@ function updateMatchupBar() {
 
 function getFilteredTeams() {
   const normalized = searchTerm.trim().toLowerCase();
-
   let filtered = teams;
 
   if (normalized) {
@@ -153,11 +146,7 @@ function getFilteredTeams() {
   return [...filtered].sort((a, b) => {
     const aFav = isFavorite(a.id) ? 1 : 0;
     const bFav = isFavorite(b.id) ? 1 : 0;
-
-    if (bFav !== aFav) {
-      return bFav - aFav;
-    }
-
+    if (bFav !== aFav) return bFav - aFav;
     return a.name.localeCompare(b.name);
   });
 }
@@ -182,7 +171,7 @@ function renderTeams() {
   filteredTeams.forEach((team) => {
     const isSelectedA = selectedTeamA && selectedTeamA.id === team.id;
     const isSelectedB = selectedTeamB && selectedTeamB.id === team.id;
-    const isSelected = isSelectedA || isSelectedB;
+    const isSelected  = isSelectedA || isSelectedB;
 
     const slotLabel = isSelectedA
       ? "Team A Selected"
@@ -195,18 +184,15 @@ function renderTeams() {
 
     card.innerHTML = `
       <div class="team-color"></div>
-
       <div class="team-header">
         <div>
           <div class="team-name">${team.name}</div>
           <div class="team-conf">${team.conference} • ${team.region}</div>
         </div>
-
         <button class="favorite-btn" aria-label="Toggle favorite">
           ${isFavorite(team.id) ? "★" : "☆"}
         </button>
       </div>
-
       <div class="stats">
         <div class="stat-box">
           <div class="stat-label">Offense</div>
@@ -225,16 +211,14 @@ function renderTeams() {
           <div class="stat-value">${team.three_pt_pct}%</div>
         </div>
       </div>
-
       <button class="select-btn ${isSelected ? "selected" : ""}">
         ${slotLabel}
       </button>
     `;
 
     card.querySelector(".select-btn").onclick = () => selectTeam(team);
-
-    card.querySelector(".favorite-btn").onclick = (event) => {
-      event.stopPropagation();
+    card.querySelector(".favorite-btn").onclick = (e) => {
+      e.stopPropagation();
       toggleFavorite(team.id);
     };
 
@@ -245,204 +229,223 @@ function renderTeams() {
 }
 
 function selectTeam(team) {
-  if (selectedTeamA && selectedTeamA.id === team.id) {
-    selectedTeamA = null;
-    renderTeams();
-    return;
-  }
-
-  if (selectedTeamB && selectedTeamB.id === team.id) {
-    selectedTeamB = null;
-    renderTeams();
-    return;
-  }
-
-  if (!selectedTeamA) {
-    selectedTeamA = team;
-    renderTeams();
-    return;
-  }
-
-  if (!selectedTeamB) {
-    selectedTeamB = team;
-    renderTeams();
-    return;
-  }
-
+  if (selectedTeamA && selectedTeamA.id === team.id) { selectedTeamA = null; renderTeams(); return; }
+  if (selectedTeamB && selectedTeamB.id === team.id) { selectedTeamB = null; renderTeams(); return; }
+  if (!selectedTeamA) { selectedTeamA = team; renderTeams(); return; }
+  if (!selectedTeamB) { selectedTeamB = team; renderTeams(); return; }
   selectedTeamA = team;
   selectedTeamB = null;
   renderTeams();
 }
 
-function pushStrategy(strategies, teamKey, teamName, type, title, text) {
-  strategies.push({
-    team: teamKey,
-    teamName,
-    type,
-    title,
-    text,
-  });
+// --------------------------------------------------
+// TEAM COMPARER (by Valentino Simeonidis)
+// --------------------------------------------------
+
+function num(val) { return parseFloat(val) || 0; }
+function clamp(value, min, max) { return Math.max(min, Math.min(max, value)); }
+function normalize(value, min, max) { return clamp(((value - min) / (max - min)) * 100, 0, 100); }
+function sigmoid(x) { return 1 / (1 + Math.exp(-x)); }
+
+function balanceScore(team) {
+  const stats = [team.n_fg, team.n_three, team.n_ft, team.n_apg, team.n_rpg, team.n_spg, team.n_bpg];
+  const avg = stats.reduce((a, b) => a + b, 0) / stats.length;
+  const variance = stats.reduce((a, val) => a + Math.pow(val - avg, 2), 0) / stats.length;
+  return 100 - Math.sqrt(variance);
 }
 
-function generateStrategies(a, b) {
-  const strategies = [];
+function normalizeTeam(t) {
+  const fg = num(t.fg_pct), three = num(t.three_pt_pct), ft = num(t.ft_pct);
+  const ppg = num(t.ppg), apg = num(t.apg), rpg = num(t.rpg), spg = num(t.spg), bpg = num(t.bpg);
 
-  if (a.three_pt_pct > b.three_pt_pct) {
-    pushStrategy(
-      strategies,
-      "A",
-      a.name,
-      "Offense",
-      "Create perimeter looks",
-      `${a.name} has the stronger three-point shooting profile. Use drive-and-kick actions, extra passing, and early spacing to generate clean shots.`,
-    );
-  } else if (b.three_pt_pct > a.three_pt_pct) {
-    pushStrategy(
-      strategies,
-      "B",
-      b.name,
-      "Offense",
-      "Create perimeter looks",
-      `${b.name} has the stronger three-point shooting profile. Use drive-and-kick actions, extra passing, and early spacing to generate clean shots.`,
-    );
-  }
+  const n_fg    = normalize(fg,    40, 55);
+  const n_three = normalize(three, 28, 42);
+  const n_ft    = normalize(ft,    60, 90);
+  const n_ppg   = normalize(ppg,   90, 125);
+  const n_apg   = normalize(apg,   15, 35);
+  const n_rpg   = normalize(rpg,   35, 55);
+  const n_spg   = normalize(spg,    4, 12);
+  const n_bpg   = normalize(bpg,    2,  8);
 
-  if (a.rpg > b.rpg) {
-    pushStrategy(
-      strategies,
-      "A",
-      a.name,
-      "Rebounding",
-      "Control the glass",
-      `${a.name} has the rebounding edge. Prioritize second-chance opportunities and limit extra possessions for ${b.name}.`,
-    );
-  } else if (b.rpg > a.rpg) {
-    pushStrategy(
-      strategies,
-      "B",
-      b.name,
-      "Rebounding",
-      "Control the glass",
-      `${b.name} has the rebounding edge. Prioritize second-chance opportunities and limit extra possessions for ${a.name}.`,
-    );
-  }
+  const offense     = n_fg * 0.30 + n_three * 0.23 + n_apg * 0.22 + n_ppg * 0.15 + n_ft * 0.10;
+  const defense     = n_rpg * 0.42 + n_spg * 0.36 + n_bpg * 0.22;
+  const consistency = n_ft * 0.35 + n_apg * 0.30 + defense * 0.35;
+  const balance     = balanceScore({ n_fg, n_three, n_ft, n_apg, n_rpg, n_spg, n_bpg });
+  const power       = offense * 0.56 + defense * 0.30 + consistency * 0.08 + balance * 0.06;
 
-  if (a.plus_minus > b.plus_minus) {
-    pushStrategy(
-      strategies,
-      "B",
-      b.name,
-      "Composure",
-      "Limit scoring runs",
-      `${a.name} has the stronger scoring margin. ${b.name} needs disciplined possessions, transition defense, and fewer empty trips.`,
-    );
-  } else if (b.plus_minus > a.plus_minus) {
-    pushStrategy(
-      strategies,
-      "A",
-      a.name,
-      "Composure",
-      "Limit scoring runs",
-      `${b.name} has the stronger scoring margin. ${a.name} needs disciplined possessions, transition defense, and fewer empty trips.`,
-    );
-  }
-
-  if (a.bpg > b.bpg) {
-    pushStrategy(
-      strategies,
-      "B",
-      b.name,
-      "Shot Selection",
-      "Avoid forced rim attempts",
-      `${a.name} protects the rim better. ${b.name} should use spacing, kick-outs, and pull-ups instead of forcing contested finishes.`,
-    );
-  } else if (b.bpg > a.bpg) {
-    pushStrategy(
-      strategies,
-      "A",
-      a.name,
-      "Shot Selection",
-      "Avoid forced rim attempts",
-      `${b.name} protects the rim better. ${a.name} should use spacing, kick-outs, and pull-ups instead of forcing contested finishes.`,
-    );
-  }
-
-  if (strategies.length === 0) {
-    pushStrategy(
-      strategies,
-      "A",
-      a.name,
-      "General",
-      "Win the possession battle",
-      "This matchup is statistically close. Focus on execution, transition defense, rebounding, and limiting turnovers.",
-    );
-  }
-
-  return strategies;
+  return { name: t.name, fg, three, ft, ppg, apg, rpg, spg, bpg, n_fg, n_three, n_ft, n_ppg, n_apg, n_rpg, n_spg, n_bpg, offense, defense, consistency, balance, power };
 }
+
+function matchupEdge(a, b, stat, label) {
+  const diff = a[stat] - b[stat];
+  const abs  = Math.abs(diff);
+  if (abs < 4)  return { label, edge: "Even",     winner: null };
+  if (abs < 10) return { label, edge: "Slight",   winner: diff > 0 ? a.name : b.name };
+  if (abs < 18) return { label, edge: "Moderate", winner: diff > 0 ? a.name : b.name };
+  return             { label, edge: "Strong",    winner: diff > 0 ? a.name : b.name };
+}
+
+function aiRecommendations(team, opponent) {
+  const tips = [];
+  if (team.n_fg    < opponent.n_fg)    tips.push("Improve shot selection and scoring efficiency.");
+  if (team.n_three < opponent.n_three) tips.push("Generate more consistent perimeter offense.");
+  if (team.n_apg   < opponent.n_apg)   tips.push("Increase ball movement and passing flow.");
+  if (team.n_rpg   < opponent.n_rpg)   tips.push("Improve rebounding and second-chance prevention.");
+  if (team.n_spg   < opponent.n_spg)   tips.push("Apply stronger perimeter defensive pressure.");
+  if (team.n_ft    < 45)               tips.push("Improve free throw consistency in close games.");
+  if (tips.length === 0)               tips.push("Maintain current strengths and team balance.");
+  return tips.slice(0, 3);
+}
+
+function runComparerAnalysis(a, b) {
+  const A = normalizeTeam(a);
+  const B = normalizeTeam(b);
+
+  let differential = A.power - B.power;
+  differential += (A.offense - B.defense) * 0.14;
+  differential -= (B.offense - A.defense) * 0.14;
+  differential += (A.n_apg - B.n_apg) * 0.035;
+  differential += (A.n_ft  - B.n_ft)  * 0.025;
+  differential += (A.n_rpg - B.n_rpg) * 0.03;
+  differential += (A.n_spg - B.n_spg) * 0.025;
+  differential += (A.balance - B.balance) * 0.02;
+
+  if (Math.abs(differential) < 5) differential *= 0.82;
+  differential = clamp(differential, -16, 16);
+
+  let winA = sigmoid(differential / 6.8) * 100;
+  winA = clamp(winA, 14, 86);
+  const winB = 100 - winA;
+
+  const winner     = winA > winB ? A.name : B.name;
+  const spread     = Math.abs(winA - winB);
+  const confidence = spread < 10 ? "Low" : spread < 22 ? "Medium" : "High";
+
+  const report = [
+    matchupEdge(A, B, "n_fg",    "Shooting"),
+    matchupEdge(A, B, "n_three", "3PT Shooting"),
+    matchupEdge(A, B, "n_apg",   "Playmaking"),
+    matchupEdge(A, B, "n_rpg",   "Rebounding"),
+    matchupEdge(A, B, "n_spg",   "Defense"),
+    matchupEdge(A, B, "n_bpg",   "Rim Protection"),
+  ];
+
+  return { A, B, winA, winB, winner, confidence, report, recA: aiRecommendations(A, B), recB: aiRecommendations(B, A) };
+}
+
+// --------------------------------------------------
+// RADAR CHART WITH HOVER TOOLTIPS
+// --------------------------------------------------
 
 function radarPoints(values, cx, cy, radius) {
-  const labels = values.length;
-
-  return values
-    .map((value, i) => {
-      const angle = -Math.PI / 2 + (2 * Math.PI * i) / labels;
-      const safeValue = Math.max(0, Math.min(100, value));
-      const r = radius * (safeValue / 100);
-      const x = cx + Math.cos(angle) * r;
-      const y = cy + Math.sin(angle) * r;
-
-      return `${x},${y}`;
-    })
-    .join(" ");
+  return values.map((value, i) => {
+    const angle = -Math.PI / 2 + (2 * Math.PI * i) / values.length;
+    const r     = radius * (Math.max(0, Math.min(100, value)) / 100);
+    return `${cx + Math.cos(angle) * r},${cy + Math.sin(angle) * r}`;
+  }).join(" ");
 }
 
 function renderRadar(a, b) {
-  const aValues = [
-    offenseRating(a),
-    defenseRating(a),
-    shootingRating(a),
-    Math.min(100, a.rpg * 2),
-    Math.min(100, controlRating(a)),
-    Math.min(100, a.ppg),
-  ];
+  const CA = "#3b82f6", CB = "#14b8a6";
 
-  const bValues = [
-    offenseRating(b),
-    defenseRating(b),
-    shootingRating(b),
-    Math.min(100, b.rpg * 2),
-    Math.min(100, controlRating(b)),
-    Math.min(100, b.ppg),
-  ];
+  const aValues = [offenseRating(a), defenseRating(a), shootingRating(a), Math.min(100, a.rpg * 2), Math.min(100, controlRating(a)), Math.min(100, a.ppg)];
+  const bValues = [offenseRating(b), defenseRating(b), shootingRating(b), Math.min(100, b.rpg * 2), Math.min(100, controlRating(b)), Math.min(100, b.ppg)];
 
-  const labels = [
-    ["Offense", 200, 20],
-    ["Defense", 335, 95],
-    ["Shooting", 335, 245],
-    ["Rebounding", 200, 320],
-    ["Control", 55, 245],
-    ["Tempo", 55, 95],
-  ];
+  const statLabels = ["Offense", "Defense", "Shooting", "Rebounding", "Control", "Tempo"];
+  const labelPos   = [[200, 18], [342, 95], [342, 252], [200, 328], [55, 252], [55, 95]];
+  const cx = 200, cy = 170, radius = 120;
+
+  const buildDots = (values, teamName, color) =>
+    values.map((value, i) => {
+      const angle = -Math.PI / 2 + (2 * Math.PI * i) / 6;
+      const r     = radius * (Math.max(0, Math.min(100, value)) / 100);
+      return { x: cx + Math.cos(angle) * r, y: cy + Math.sin(angle) * r, label: statLabels[i], value: Math.round(value), team: teamName, color };
+    });
+
+  const allDots = [...buildDots(aValues, a.name, CA), ...buildDots(bValues, b.name, CB)];
+  const dotsSVG = allDots.map((d, idx) =>
+    `<circle class="radar-dot" cx="${d.x}" cy="${d.y}" r="6" fill="${d.color}" stroke="rgba(2,6,23,0.8)" stroke-width="2" data-idx="${idx}" style="cursor:pointer;"/>`
+  ).join("");
 
   return `
-    <div class="card pro-card">
-      <div class="panel-title">Skill Profile</div>
-      <div class="radar-wrap">
-        <svg width="400" height="340" viewBox="0 0 400 340">
-          <polygon points="200,50 312,110 312,230 200,290 88,230 88,110" fill="none" stroke="#334155"/>
-          <polygon points="200,90 276,130 276,210 200,250 124,210 124,130" fill="none" stroke="#334155"/>
-          <polygon points="200,130 240,150 240,190 200,210 160,190 160,150" fill="none" stroke="#334155"/>
-
-          <polygon points="${radarPoints(aValues, 200, 170, 120)}" fill="rgba(226,232,240,0.25)" stroke="#e2e8f0" stroke-width="2"/>
-          <polygon points="${radarPoints(bValues, 200, 170, 120)}" fill="rgba(100,116,139,0.24)" stroke="#64748b" stroke-width="2"/>
-
-          ${labels.map(([text, x, y]) => `<text x="${x}" y="${y}" text-anchor="middle">${text}</text>`).join("")}
+    <div class="card pro-card" style="margin-top:22px;">
+      <div class="radar-header">
+        <div class="panel-title" style="margin-bottom:0;">Skill Profile</div>
+        <div class="radar-legend">
+          <span class="radar-legend-dot" style="background:${CA}"></span><span>${a.name}</span>
+          <span class="radar-legend-dot" style="background:${CB};margin-left:12px;"></span><span>${b.name}</span>
+        </div>
+      </div>
+      <div class="radar-wrap" style="position:relative;">
+        <svg id="radarSvg" width="400" height="340" viewBox="0 0 400 340"
+          data-dots='${JSON.stringify(allDots).replace(/'/g, "&apos;")}'>
+          <polygon points="200,50 312,110 312,230 200,290 88,230 88,110"    fill="none" stroke="#1e293b"/>
+          <polygon points="200,90 276,130 276,210 200,250 124,210 124,130"  fill="none" stroke="#1e293b"/>
+          <polygon points="200,130 240,150 240,190 200,210 160,190 160,150" fill="none" stroke="#1e293b"/>
+          <polygon points="${radarPoints(aValues, cx, cy, radius)}" fill="${CA}28" stroke="${CA}" stroke-width="2"/>
+          <polygon points="${radarPoints(bValues, cx, cy, radius)}" fill="${CB}28" stroke="${CB}" stroke-width="2"/>
+          ${dotsSVG}
+          ${labelPos.map(([x, y], i) => `<text x="${x}" y="${y}" text-anchor="middle">${statLabels[i]}</text>`).join("")}
         </svg>
+        <div id="radarTooltip" class="radar-tooltip hidden"></div>
       </div>
     </div>
   `;
 }
+
+function attachRadarTooltip() {
+  const svg = document.getElementById("radarSvg");
+  if (!svg) return;
+  const tooltip  = document.getElementById("radarTooltip");
+  const dotsData = JSON.parse(svg.dataset.dots);
+
+  svg.querySelectorAll(".radar-dot").forEach((dot) => {
+    const d = dotsData[parseInt(dot.dataset.idx)];
+    dot.addEventListener("mouseenter", (e) => {
+      tooltip.innerHTML = `<span style="color:${d.color};font-weight:900;">${d.team}</span><br>${d.label}: <strong>${d.value}</strong>`;
+      tooltip.classList.remove("hidden");
+      positionTooltip(e, tooltip);
+    });
+    dot.addEventListener("mousemove",  (e) => positionTooltip(e, tooltip));
+    dot.addEventListener("mouseleave", ()  => tooltip.classList.add("hidden"));
+  });
+}
+
+function positionTooltip(e, tooltip) {
+  const rect = tooltip.parentElement.getBoundingClientRect();
+  let x = e.clientX - rect.left + 14;
+  let y = e.clientY - rect.top  - 42;
+  if (x + 150 > rect.width) x = e.clientX - rect.left - 155;
+  if (y < 0)                 y = e.clientY - rect.top  + 14;
+  tooltip.style.left = x + "px";
+  tooltip.style.top  = y + "px";
+}
+
+// --------------------------------------------------
+// FOCUS TAB SWITCHER
+// --------------------------------------------------
+
+function switchFocusTab(tab) {
+  const showA = tab === "A";
+  document.getElementById("focusPanelA").classList.toggle("hidden", !showA);
+  document.getElementById("focusPanelB").classList.toggle("hidden",  showA);
+  document.getElementById("focusBtnA").classList.toggle("tab-active",  showA);
+  document.getElementById("focusBtnB").classList.toggle("tab-active", !showA);
+}
+
+// --------------------------------------------------
+// EDGE BADGE
+// --------------------------------------------------
+
+function edgeBadge(edge, winner, nameA, CA, CB) {
+  if (edge === "Even") return `<span class="edge-badge edge-even">Even</span>`;
+  const color = winner === nameA ? CA : CB;
+  return `<span class="edge-badge" style="background:${color}20;color:${color};border-color:${color}44;">${edge} — ${winner}</span>`;
+}
+
+// --------------------------------------------------
+// RENDER COMPARISON
+// --------------------------------------------------
 
 function renderComparison() {
   const container = document.getElementById("comparisonContent");
@@ -459,147 +462,178 @@ function renderComparison() {
 
   const a = selectedTeamA;
   const b = selectedTeamB;
-  const strategies = generateStrategies(a, b);
+  const CA = "#3b82f6";
+  const CB = "#14b8a6";
+  const ai = runComparerAnalysis(a, b);
 
   const bars = [
-    ["PPG", a.ppg, b.ppg, 100],
-    ["FG%", a.fg_pct, b.fg_pct, 100],
+    ["PPG", a.ppg,          b.ppg,          100],
+    ["FG%", a.fg_pct,       b.fg_pct,       100],
     ["3P%", a.three_pt_pct, b.three_pt_pct, 100],
-    ["REB", a.rpg, b.rpg, 60],
-    ["APG", a.apg, b.apg, 30],
-    ["TS%", a.ts_pct, b.ts_pct, 100],
+    ["REB", a.rpg,          b.rpg,          60],
+    ["APG", a.apg,          b.apg,          30],
+    ["TS%", a.ts_pct,       b.ts_pct,       100],
   ];
 
   container.innerHTML = `
+
+    <!-- HERO -->
     <div class="matchup-hero">
-      <div class="matchup-team-card">
-        <div class="eyebrow">Team A</div>
+      <div class="matchup-team-card" style="border-top:3px solid ${CA};">
+        <div class="eyebrow" style="color:${CA};">Team A</div>
         <div class="team-name">${a.name}</div>
         <div class="team-conf">${a.conference} • ${a.region}</div>
-
         <div class="hero-stats">
-          <div>
-            <span>Offense</span>
-            <strong>${offenseRating(a)}</strong>
-          </div>
-          <div>
-            <span>Defense</span>
-            <strong>${defenseRating(a)}</strong>
-          </div>
+          <div><span>Offense</span><strong style="color:${CA};">${offenseRating(a)}</strong></div>
+          <div><span>Defense</span><strong style="color:${CA};">${defenseRating(a)}</strong></div>
         </div>
       </div>
 
       <div class="matchup-center">
         <div class="vs-pill">VS</div>
-        <div class="muted small">Professional matchup breakdown</div>
+        <div class="muted small">AI-powered matchup analysis</div>
       </div>
 
-      <div class="matchup-team-card opponent">
-        <div class="eyebrow">Team B</div>
+      <div class="matchup-team-card opponent" style="border-top:3px solid ${CB};">
+        <div class="eyebrow" style="color:${CB};">Team B</div>
         <div class="team-name">${b.name}</div>
         <div class="team-conf">${b.conference} • ${b.region}</div>
-
         <div class="hero-stats">
-          <div>
-            <span>Offense</span>
-            <strong>${offenseRating(b)}</strong>
-          </div>
-          <div>
-            <span>Defense</span>
-            <strong>${defenseRating(b)}</strong>
-          </div>
+          <div><span>Offense</span><strong style="color:${CB};">${offenseRating(b)}</strong></div>
+          <div><span>Defense</span><strong style="color:${CB};">${defenseRating(b)}</strong></div>
         </div>
       </div>
     </div>
 
+    <!-- MAIN GRID -->
     <div class="comparison-layout">
+
+      <!-- LEFT -->
       <div>
         <div class="card pro-card">
           <div class="panel-title">Statistical Profile</div>
-
-          ${bars
-            .map(
-              ([label, av, bv, max]) => `
+          <div class="bar-legend">
+            <span class="bar-legend-dot" style="background:${CA}"></span><span>${a.name}</span>
+            <span class="bar-legend-dot" style="background:${CB};margin-left:14px;"></span><span>${b.name}</span>
+          </div>
+          ${bars.map(([label, av, bv, max]) => `
             <div class="pro-row">
               <div class="pro-row-top">
                 <span>${label}</span>
-                <span>${a.name}: ${av} / ${b.name}: ${bv}</span>
+                <span>
+                  <span style="color:${CA};font-weight:700;">${av}</span>
+                  &nbsp;/&nbsp;
+                  <span style="color:${CB};font-weight:700;">${bv}</span>
+                </span>
               </div>
-
               <div class="pro-bars">
-                <div class="pro-bar">
-                  <div style="width:${Math.min(100, (av / max) * 100)}%"></div>
+                <div class="pro-bar" style="background:rgba(59,130,246,0.1);">
+                  <div style="width:${Math.min(100,(av/max)*100)}%;background:${CA};"></div>
                 </div>
-
-                <div class="pro-bar muted-bar">
-                  <div style="width:${Math.min(100, (bv / max) * 100)}%"></div>
+                <div class="pro-bar" style="background:rgba(20,184,166,0.1);">
+                  <div style="width:${Math.min(100,(bv/max)*100)}%;background:${CB};"></div>
                 </div>
               </div>
             </div>
-          `,
-            )
-            .join("")}
+          `).join("")}
         </div>
 
         ${renderRadar(a, b)}
       </div>
 
+      <!-- RIGHT -->
       <div>
         <div class="card pro-card">
-          <div class="panel-title">Game Plan</div>
 
-          <div class="strategy-list">
-            ${strategies
-              .map(
-                (s) => `
-              <div class="strategy-item neutral">
-                <div class="strategy-type">${s.teamName} • ${s.type}</div>
-                <div class="strategy-title">${s.title}</div>
-                <div>${s.text}</div>
+          <!-- PREDICTED WINNER -->
+          <div class="panel-title">Predicted Winner</div>
+          <div class="win-block">
+            <div class="win-trophy">🏆 <strong>${ai.winner}</strong></div>
+            <div class="win-conf-row">
+              Confidence:
+              <span class="conf-pill conf-${ai.confidence.toLowerCase()}">${ai.confidence}</span>
+            </div>
+            <div class="win-bar-labels">
+              <span style="color:${CA};font-weight:800;">${a.name}</span>
+              <span style="color:${CB};font-weight:800;">${b.name}</span>
+            </div>
+            <div class="win-bar-track">
+              <div class="win-bar-fill" style="width:${ai.winA.toFixed(1)}%;background:${CA};"></div>
+            </div>
+            <div class="win-bar-labels">
+              <span style="color:${CA};">${ai.winA.toFixed(1)}%</span>
+              <span style="color:${CB};">${ai.winB.toFixed(1)}%</span>
+            </div>
+            <div class="power-row">
+              <div class="power-cell" style="border-color:${CA}33;">
+                <div class="power-name" style="color:${CA};">${a.name}</div>
+                <div class="power-line">Offense <strong>${ai.A.offense.toFixed(1)}</strong></div>
+                <div class="power-line">Defense <strong>${ai.A.defense.toFixed(1)}</strong></div>
+                <div class="power-line">Power <strong>${ai.A.power.toFixed(1)}</strong></div>
               </div>
-            `,
-              )
-              .join("")}
+              <div class="power-cell" style="border-color:${CB}33;">
+                <div class="power-name" style="color:${CB};">${b.name}</div>
+                <div class="power-line">Offense <strong>${ai.B.offense.toFixed(1)}</strong></div>
+                <div class="power-line">Defense <strong>${ai.B.defense.toFixed(1)}</strong></div>
+                <div class="power-line">Power <strong>${ai.B.power.toFixed(1)}</strong></div>
+              </div>
+            </div>
           </div>
+
+          <!-- MATCHUP BREAKDOWN -->
+          <div class="panel-title" style="margin-top:24px;">Matchup Breakdown</div>
+          <div class="breakdown-table">
+            ${ai.report.map(r => `
+              <div class="breakdown-row">
+                <span class="breakdown-label">${r.label}</span>
+                ${edgeBadge(r.edge, r.winner, a.name, CA, CB)}
+              </div>
+            `).join("")}
+          </div>
+
+          <!-- COMPETITIVE FOCUS -->
+          <div class="panel-title" style="margin-top:24px;">Competitive Focus</div>
+          <div class="tab-bar">
+            <button id="focusBtnA" class="tab-btn tab-active" onclick="switchFocusTab('A')"
+              style="--tab-color:${CA};">${a.name}</button>
+            <button id="focusBtnB" class="tab-btn" onclick="switchFocusTab('B')"
+              style="--tab-color:${CB};">${b.name}</button>
+          </div>
+
+          <div id="focusPanelA" class="focus-panel">
+            ${ai.recA.map(r => `<div class="focus-item" style="border-left-color:${CA};">${r}</div>`).join("")}
+          </div>
+          <div id="focusPanelB" class="focus-panel hidden">
+            ${ai.recB.map(r => `<div class="focus-item" style="border-left-color:${CB};">${r}</div>`).join("")}
+          </div>
+
         </div>
       </div>
     </div>
   `;
+
+  attachRadarTooltip();
 }
 
 function showPage(page) {
-  document
-    .getElementById("dashboardPage")
-    .classList.toggle("hidden", page !== "dashboard");
-  document
-    .getElementById("comparisonPage")
-    .classList.toggle("hidden", page !== "comparison");
+  document.getElementById("dashboardPage").classList.toggle("hidden", page !== "dashboard");
+  document.getElementById("comparisonPage").classList.toggle("hidden", page !== "comparison");
 
   const buttons = document.querySelectorAll(".nav button");
   buttons.forEach((btn) => btn.classList.remove("active"));
 
-  if (page === "dashboard") buttons[0].classList.add("active");
+  if (page === "dashboard")  buttons[0].classList.add("active");
   if (page === "comparison") buttons[1].classList.add("active");
-
-  if (page === "comparison") {
-    renderComparison();
-  }
+  if (page === "comparison") renderComparison();
 }
 
 function goToComparison() {
-  if (
-    !selectedTeamA ||
-    !selectedTeamB ||
-    selectedTeamA.id === selectedTeamB.id
-  ) {
-    return;
-  }
-
+  if (!selectedTeamA || !selectedTeamB || selectedTeamA.id === selectedTeamB.id) return;
   showPage("comparison");
 }
 
-document.getElementById("teamSearch").addEventListener("input", (event) => {
-  searchTerm = event.target.value;
+document.getElementById("teamSearch").addEventListener("input", (e) => {
+  searchTerm = e.target.value;
   renderTeams();
 });
 
