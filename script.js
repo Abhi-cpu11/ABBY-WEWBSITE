@@ -367,14 +367,13 @@ function runComparerAnalysis(a, b) {
   const spread     = Math.abs(winA - winB);
   const confidence = spread < 10 ? "Low" : spread < 22 ? "Medium" : "High";
 
-  const report = [
-    matchupEdge(A, B, "n_fg",    "Shooting"),
-    matchupEdge(A, B, "n_three", "3PT Shooting"),
-    matchupEdge(A, B, "n_apg",   "Playmaking"),
-    matchupEdge(A, B, "n_rpg",   "Rebounding"),
-    matchupEdge(A, B, "n_spg",   "Defense"),
-    matchupEdge(A, B, "n_bpg",   "Rim Protection"),
-  ];
+const report = [
+  matchupEdge(A, B, "n_three", "3PT Shooting"),
+  matchupEdge(A, B, "n_apg", "Playmaking"),
+  matchupEdge(A, B, "n_rpg", "Rebounding"),
+  matchupEdge(A, B, "n_spg", "Steals"),
+  matchupEdge(A, B, "n_bpg", "Blocks"),
+];
 
   // FIX: A's tips = A vs B, B's tips = B vs A — keeps them distinct
   const recA = aiRecommendations(A, B);
@@ -403,21 +402,21 @@ function renderRadar(a, b) {
     offenseRating(a),
     defenseRating(a),
     shootingRating(a),
-    Math.min(100, a.rpg * 2),
-    Math.min(100, controlRating(a)),
-    Math.min(100, tempoRating(a)),  // PPG-based tempo proxy
-  ];
+    Math.min(100, a.rpg),
+Math.min(100, a.apg),
+Math.min(100, a.ppg),
+  ]
 
   const bValues = [
     offenseRating(b),
     defenseRating(b),
     shootingRating(b),
-    Math.min(100, b.rpg * 2),
-    Math.min(100, controlRating(b)),
-    Math.min(100, tempoRating(b)),  // PPG-based tempo proxy
+    Math.min(100, b.rpg),
+Math.min(100, b.apg),
+Math.min(100, b.ppg),// PPG-based tempo proxy
   ];
 
-  const statLabels = ["Offense", "Defense", "Shooting", "Rebounding", "Control", "Tempo"];
+  const statLabels = ["Offense", "Defense", "3PT Shooting", "Rebounding", "Assists", "PPG"];
   const labelPos   = [[200, 18], [342, 95], [342, 252], [200, 328], [55, 252], [55, 95]];
   const cx = 200, cy = 170, radius = 120;
 
@@ -430,7 +429,7 @@ function renderRadar(a, b) {
 
   const allDots = [...buildDots(aValues, a.name, CA), ...buildDots(bValues, b.name, CB)];
   const dotsSVG = allDots.map((d, idx) =>
-    `<circle class="radar-dot" cx="${d.x}" cy="${d.y}" r="6" fill="${d.color}" stroke="rgba(2,6,23,0.8)" stroke-width="2" data-idx="${idx}" style="cursor:pointer;"/>`
+    `<circle class="radar-dot" cx="${d.x}" cy="${d.y}" r="2.5" fill="${d.color}" stroke="rgba(2,6,23,0.8)" stroke-width="2" data-idx="${idx}" style="cursor:pointer;"/>`
   ).join("");
 
   return `
@@ -543,14 +542,14 @@ function renderComparison() {
   const CB = "#14b8a6";
   const ai = runComparerAnalysis(a, b);
 
-  const bars = [
-    ["PPG", a.ppg,          b.ppg,          100],
-    ["FG%", a.fg_pct,       b.fg_pct,       100],
-    ["3P%", a.three_pt_pct, b.three_pt_pct, 100],
-    ["REB", a.rpg,          b.rpg,          60],
-    ["APG", a.apg,          b.apg,          30],
-    ["TS%", a.ts_pct,       b.ts_pct,       100],
-  ];
+const bars = [
+  ["3PT Shooting", a.three_pt_pct, b.three_pt_pct, 45],
+  ["Playmaking", a.apg, b.apg, 25],
+  ["Rebounding", a.rpg, b.rpg, 45],
+  ["Defensive Pressure", a.spg, b.spg, 12],
+  ["Rim Protection", a.bpg, b.bpg, 8],
+  ["PPG", a.ppg, b.ppg, 100],
+];
 
   // Build focus tip HTML separately so we can verify they differ
   const focusA = ai.recA.map(r => `<div class="focus-item" style="border-left-color:${CA};">${r}</div>`).join("");
@@ -644,20 +643,6 @@ function renderComparison() {
             <div class="win-bar-labels">
               <span style="color:${CA};">${ai.winA.toFixed(1)}%</span>
               <span style="color:${CB};">${ai.winB.toFixed(1)}%</span>
-            </div>
-            <div class="power-row">
-              <div class="power-cell" style="border-color:${CA}33;">
-                <div class="power-name" style="color:${CA};">${a.name}</div>
-                <div class="power-line">Offense <strong>${ai.A.offense.toFixed(1)}</strong></div>
-                <div class="power-line">Defense <strong>${ai.A.defense.toFixed(1)}</strong></div>
-                <div class="power-line">Power   <strong>${ai.A.power.toFixed(1)}</strong></div>
-              </div>
-              <div class="power-cell" style="border-color:${CB}33;">
-                <div class="power-name" style="color:${CB};">${b.name}</div>
-                <div class="power-line">Offense <strong>${ai.B.offense.toFixed(1)}</strong></div>
-                <div class="power-line">Defense <strong>${ai.B.defense.toFixed(1)}</strong></div>
-                <div class="power-line">Power   <strong>${ai.B.power.toFixed(1)}</strong></div>
-              </div>
             </div>
           </div>
 
