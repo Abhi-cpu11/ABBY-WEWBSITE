@@ -401,7 +401,7 @@ function renderRadar(a, b) {
   const aValues = [
     offenseRating(a),
     defenseRating(a),
-    shootingRating(a),
+      a.three_pt_pct,
     Math.min(100, a.rpg),
 Math.min(100, a.apg),
 Math.min(100, a.ppg),
@@ -410,15 +410,15 @@ Math.min(100, a.ppg),
   const bValues = [
     offenseRating(b),
     defenseRating(b),
-    shootingRating(b),
+      b.three_pt_pct,
     Math.min(100, b.rpg),
 Math.min(100, b.apg),
-Math.min(100, b.ppg),// PPG-based tempo proxy
+Math.min(100, b.ppg),
   ];
 
   const statLabels = ["Offense", "Defense", "3PT Shooting", "Rebounding", "Assists", "PPG"];
   const labelPos   = [[200, 18], [342, 95], [342, 252], [200, 328], [55, 252], [55, 95]];
-  const cx = 200, cy = 170, radius = 120;
+  const cx = 200, cy = 170, radius = 140;
 
   const buildDots = (values, teamName, color) =>
     values.map((value, i) => {
@@ -544,13 +544,12 @@ function renderComparison() {
 
 const bars = [
   ["3PT Shooting", a.three_pt_pct, b.three_pt_pct, 45],
-  ["Playmaking", a.apg, b.apg, 25],
+  ["Assists", a.apg, b.apg, 25],
   ["Rebounding", a.rpg, b.rpg, 45],
-  ["Defensive Pressure", a.spg, b.spg, 12],
-  ["Rim Protection", a.bpg, b.bpg, 8],
+  ["Steals", a.spg, b.spg, 12],
+  ["Blocks", a.bpg, b.bpg, 8],
   ["PPG", a.ppg, b.ppg, 100],
 ];
-
   // Build focus tip HTML separately so we can verify they differ
   const focusA = ai.recA.map(r => `<div class="focus-item" style="border-left-color:${CA};">${r}</div>`).join("");
   const focusB = ai.recB.map(r => `<div class="focus-item" style="border-left-color:${CB};">${r}</div>`).join("");
