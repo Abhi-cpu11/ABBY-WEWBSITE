@@ -763,9 +763,18 @@ function renderComparison() {
               <span style="color:${CA};">${ai.winA.toFixed(1)}%</span>
               <span style="color:${CB};">${ai.winB.toFixed(1)}%</span>
             </div>
+            <div class="win-block" style="margin-top:16px;">
+  <strong>How this matchup is calculated?</strong>
+  <p class="small" style="margin-bottom:0;">
+    Win probability and strategy tips uses a normalized comparison algorithm.
+    Visible stats come directly from the team dataset, while the prediction engine compares
+    shooting, assists, rebounding, steals, blocks, and efficiency in the background.
+  </p>
+</div>
           </div>
 
           <!-- MATCHUP BREAKDOWN -->
+
           <div class="panel-title" style="margin-top:24px;">Matchup Breakdown</div>
           <div class="breakdown-table">
             ${ai.report
