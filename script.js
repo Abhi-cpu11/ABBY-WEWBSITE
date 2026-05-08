@@ -97,7 +97,9 @@ function controlRating(team) {
 
 // Shooting = weighted blend of FG%, 3P%, and TS%
 function shootingRating(team) {
-  return Math.round(team.fg_pct * 0.6 + team.three_pt_pct * 0.7 + team.ts_pct * 0.3);
+  return Math.round(
+    team.fg_pct * 0.6 + team.three_pt_pct * 0.7 + team.ts_pct * 0.3,
+  );
 }
 
 // Tempo = PPG used as a pace proxy (more points = faster pace)
@@ -107,16 +109,20 @@ function tempoRating(team) {
 }
 
 function updateMatchupBar() {
-  const matchupBar   = document.getElementById("matchupBar");
+  const matchupBar = document.getElementById("matchupBar");
   const matchupTeamA = document.getElementById("matchupTeamA");
   const matchupTeamB = document.getElementById("matchupTeamB");
-  const matchupSub   = document.getElementById("matchupSub");
-  const analyzeBtn   = document.getElementById("analyzeBtn");
+  const matchupSub = document.getElementById("matchupSub");
+  const analyzeBtn = document.getElementById("analyzeBtn");
 
   if (selectedTeamA || selectedTeamB) {
     matchupBar.classList.remove("hidden");
-    matchupTeamA.textContent = selectedTeamA ? selectedTeamA.name : "Select Team";
-    matchupTeamB.textContent = selectedTeamB ? selectedTeamB.name : "Select Team";
+    matchupTeamA.textContent = selectedTeamA
+      ? selectedTeamA.name
+      : "Select Team";
+    matchupTeamB.textContent = selectedTeamB
+      ? selectedTeamB.name
+      : "Select Team";
 
     if (selectedTeamA && selectedTeamB) {
       matchupSub.textContent = "Ready for analysis";
@@ -136,10 +142,11 @@ function getFilteredTeams() {
   let filtered = teams;
 
   if (normalized) {
-    filtered = teams.filter((team) =>
-      team.name.toLowerCase().includes(normalized) ||
-      team.conference.toLowerCase().includes(normalized) ||
-      team.region.toLowerCase().includes(normalized),
+    filtered = teams.filter(
+      (team) =>
+        team.name.toLowerCase().includes(normalized) ||
+        team.conference.toLowerCase().includes(normalized) ||
+        team.region.toLowerCase().includes(normalized),
     );
   }
 
@@ -170,7 +177,7 @@ function renderTeams() {
   filteredTeams.forEach((team) => {
     const isSelectedA = selectedTeamA && selectedTeamA.id === team.id;
     const isSelectedB = selectedTeamB && selectedTeamB.id === team.id;
-    const isSelected  = isSelectedA || isSelectedB;
+    const isSelected = isSelectedA || isSelectedB;
 
     const slotLabel = isSelectedA
       ? "Team A Selected"
@@ -227,10 +234,26 @@ function renderTeams() {
 }
 
 function selectTeam(team) {
-  if (selectedTeamA && selectedTeamA.id === team.id) { selectedTeamA = null; renderTeams(); return; }
-  if (selectedTeamB && selectedTeamB.id === team.id) { selectedTeamB = null; renderTeams(); return; }
-  if (!selectedTeamA) { selectedTeamA = team; renderTeams(); return; }
-  if (!selectedTeamB) { selectedTeamB = team; renderTeams(); return; }
+  if (selectedTeamA && selectedTeamA.id === team.id) {
+    selectedTeamA = null;
+    renderTeams();
+    return;
+  }
+  if (selectedTeamB && selectedTeamB.id === team.id) {
+    selectedTeamB = null;
+    renderTeams();
+    return;
+  }
+  if (!selectedTeamA) {
+    selectedTeamA = team;
+    renderTeams();
+    return;
+  }
+  if (!selectedTeamB) {
+    selectedTeamB = team;
+    renderTeams();
+    return;
+  }
   selectedTeamA = team;
   selectedTeamB = null;
   renderTeams();
@@ -242,53 +265,105 @@ function selectTeam(team) {
 // matchup breakdown, and competitive focus tips
 // ==================================================
 
-function num(val) { return parseFloat(val) || 0; }
-function clamp(value, min, max) { return Math.max(min, Math.min(max, value)); }
-function normalize(value, min, max) { return clamp(((value - min) / (max - min)) * 100, 0, 100); }
-function sigmoid(x) { return 1 / (1 + Math.exp(-x)); }
+function num(val) {
+  return parseFloat(val) || 0;
+}
+function clamp(value, min, max) {
+  return Math.max(min, Math.min(max, value));
+}
+function normalize(value, min, max) {
+  return clamp(((value - min) / (max - min)) * 100, 0, 100);
+}
+function sigmoid(x) {
+  return 1 / (1 + Math.exp(-x));
+}
 
 function balanceScore(team) {
-  const stats = [team.n_fg, team.n_three, team.n_ft, team.n_apg, team.n_rpg, team.n_spg, team.n_bpg];
+  const stats = [
+    team.n_fg,
+    team.n_three,
+    team.n_ft,
+    team.n_apg,
+    team.n_rpg,
+    team.n_spg,
+    team.n_bpg,
+  ];
   const avg = stats.reduce((a, b) => a + b, 0) / stats.length;
-  const variance = stats.reduce((a, val) => a + Math.pow(val - avg, 2), 0) / stats.length;
+  const variance =
+    stats.reduce((a, val) => a + Math.pow(val - avg, 2), 0) / stats.length;
   return 100 - Math.sqrt(variance);
 }
 
 function normalizeTeam(t) {
-  const fg    = num(t.fg_pct);
+  const fg = num(t.fg_pct);
   const three = num(t.three_pt_pct);
-  const ft    = num(t.ft_pct);
-  const ppg   = num(t.ppg);
-  const apg   = num(t.apg);
-  const rpg   = num(t.rpg);
-  const spg   = num(t.spg);
-  const bpg   = num(t.bpg);
+  const ft = num(t.ft_pct);
+  const ppg = num(t.ppg);
+  const apg = num(t.apg);
+  const rpg = num(t.rpg);
+  const spg = num(t.spg);
+  const bpg = num(t.bpg);
 
-  const n_fg    = normalize(fg,    40, 55);
+  const n_fg = normalize(fg, 40, 55);
   const n_three = normalize(three, 28, 42);
-  const n_ft    = normalize(ft,    60, 90);
-  const n_ppg   = normalize(ppg,   90, 125);
-  const n_apg   = normalize(apg,   15, 35);
-  const n_rpg   = normalize(rpg,   35, 55);
-  const n_spg   = normalize(spg,    4, 12);
-  const n_bpg   = normalize(bpg,    2,  8);
+  const n_ft = normalize(ft, 60, 90);
+  const n_ppg = normalize(ppg, 90, 125);
+  const n_apg = normalize(apg, 15, 35);
+  const n_rpg = normalize(rpg, 35, 55);
+  const n_spg = normalize(spg, 4, 12);
+  const n_bpg = normalize(bpg, 2, 8);
 
-  const offense     = n_fg * 0.30 + n_three * 0.23 + n_apg * 0.22 + n_ppg * 0.15 + n_ft * 0.10;
-  const defense     = n_rpg * 0.42 + n_spg * 0.36 + n_bpg * 0.22;
-  const consistency = n_ft * 0.35 + n_apg * 0.30 + defense * 0.35;
-  const balance     = balanceScore({ n_fg, n_three, n_ft, n_apg, n_rpg, n_spg, n_bpg });
-  const power       = offense * 0.56 + defense * 0.30 + consistency * 0.08 + balance * 0.06;
+  const offense =
+    n_fg * 0.3 + n_three * 0.23 + n_apg * 0.22 + n_ppg * 0.15 + n_ft * 0.1;
+  const defense = n_rpg * 0.42 + n_spg * 0.36 + n_bpg * 0.22;
+  const consistency = n_ft * 0.35 + n_apg * 0.3 + defense * 0.35;
+  const balance = balanceScore({
+    n_fg,
+    n_three,
+    n_ft,
+    n_apg,
+    n_rpg,
+    n_spg,
+    n_bpg,
+  });
+  const power =
+    offense * 0.56 + defense * 0.3 + consistency * 0.08 + balance * 0.06;
 
-  return { name: t.name, fg, three, ft, ppg, apg, rpg, spg, bpg, n_fg, n_three, n_ft, n_ppg, n_apg, n_rpg, n_spg, n_bpg, offense, defense, consistency, balance, power };
+  return {
+    name: t.name,
+    fg,
+    three,
+    ft,
+    ppg,
+    apg,
+    rpg,
+    spg,
+    bpg,
+    n_fg,
+    n_three,
+    n_ft,
+    n_ppg,
+    n_apg,
+    n_rpg,
+    n_spg,
+    n_bpg,
+    offense,
+    defense,
+    consistency,
+    balance,
+    power,
+  };
 }
 
 function matchupEdge(a, b, stat, label) {
   const diff = a[stat] - b[stat];
-  const abs  = Math.abs(diff);
-  if (abs < 4)  return { label, edge: "Even",     winner: null };
-  if (abs < 10) return { label, edge: "Slight",   winner: diff > 0 ? a.name : b.name };
-  if (abs < 18) return { label, edge: "Moderate", winner: diff > 0 ? a.name : b.name };
-  return             { label, edge: "Strong",    winner: diff > 0 ? a.name : b.name };
+  const abs = Math.abs(diff);
+  if (abs < 4) return { label, edge: "Even", winner: null };
+  if (abs < 10)
+    return { label, edge: "Slight", winner: diff > 0 ? a.name : b.name };
+  if (abs < 18)
+    return { label, edge: "Moderate", winner: diff > 0 ? a.name : b.name };
+  return { label, edge: "Strong", winner: diff > 0 ? a.name : b.name };
 }
 
 // FIX: takes the team being analysed (subject) and their opponent separately
@@ -297,43 +372,43 @@ function aiRecommendations(subject, opponent) {
   const strategies = [
     {
       gap: opponent.n_fg - subject.n_fg,
-      text: `${subject.name} should improve shot selection because ${opponent.name} has the scoring efficiency advantage.`
+      text: `${subject.name} should improve shot selection because ${opponent.name} has the scoring efficiency advantage.`,
     },
     {
       gap: opponent.n_three - subject.n_three,
-      text: `${subject.name} needs tighter perimeter defense because ${opponent.name} shoots better from three.`
+      text: `${subject.name} needs tighter perimeter defense because ${opponent.name} shoots better from three.`,
     },
     {
       gap: opponent.n_apg - subject.n_apg,
-      text: `${subject.name} should increase ball movement to match ${opponent.name}'s playmaking ability.`
+      text: `${subject.name} should increase ball movement to match ${opponent.name}'s playmaking ability.`,
     },
     {
       gap: opponent.n_rpg - subject.n_rpg,
-      text: `${subject.name} must rebound harder to stop ${opponent.name} from controlling second-chance opportunities.`
+      text: `${subject.name} must rebound harder to stop ${opponent.name} from controlling second-chance opportunities.`,
     },
     {
       gap: opponent.n_spg - subject.n_spg,
-      text: `${subject.name} should protect the ball better because ${opponent.name} creates more defensive pressure.`
+      text: `${subject.name} should protect the ball better because ${opponent.name} creates more defensive pressure.`,
     },
     {
       gap: opponent.n_bpg - subject.n_bpg,
-      text: `${subject.name} should avoid forcing drives inside because ${opponent.name} protects the rim better.`
+      text: `${subject.name} should avoid forcing drives inside because ${opponent.name} protects the rim better.`,
     },
     {
       gap: 45 - subject.n_ft,
-      text: `${subject.name} should improve free throw consistency for late-game situations.`
-    }
+      text: `${subject.name} should improve free throw consistency for late-game situations.`,
+    },
   ];
 
   let tips = strategies
-    .filter(item => item.gap > 3)
+    .filter((item) => item.gap > 3)
     .sort((a, b) => b.gap - a.gap)
-    .map(item => item.text);
+    .map((item) => item.text);
 
   const backupTips = [
     `${subject.name} should control the pace and avoid letting ${opponent.name} speed the game up.`,
     `${subject.name} should focus on transition defense and communication.`,
-    `${subject.name} should minimize turnovers and force ${opponent.name} into half-court offense.`
+    `${subject.name} should minimize turnovers and force ${opponent.name} into half-court offense.`,
   ];
 
   while (tips.length < 3) {
@@ -351,29 +426,29 @@ function runComparerAnalysis(a, b) {
   differential += (A.offense - B.defense) * 0.14;
   differential -= (B.offense - A.defense) * 0.14;
   differential += (A.n_apg - B.n_apg) * 0.035;
-  differential += (A.n_ft  - B.n_ft)  * 0.025;
+  differential += (A.n_ft - B.n_ft) * 0.025;
   differential += (A.n_rpg - B.n_rpg) * 0.03;
   differential += (A.n_spg - B.n_spg) * 0.025;
   differential += (A.balance - B.balance) * 0.02;
 
   if (Math.abs(differential) < 5) differential *= 0.82;
-  differential = clamp(differential, -16, 16);
+  differential = clamp(differential, -20, 20);
 
-  let winA = sigmoid(differential / 6.8) * 100;
+  let winA = sigmoid(differential / 5.2) * 100;
   winA = clamp(winA, 14, 86);
   const winB = 100 - winA;
 
-  const winner     = winA > winB ? A.name : B.name;
-  const spread     = Math.abs(winA - winB);
+  const winner = winA > winB ? A.name : B.name;
+  const spread = Math.abs(winA - winB);
   const confidence = spread < 10 ? "Low" : spread < 22 ? "Medium" : "High";
 
-const report = [
-  matchupEdge(A, B, "n_three", "3PT Shooting"),
-  matchupEdge(A, B, "n_apg", "Playmaking"),
-  matchupEdge(A, B, "n_rpg", "Rebounding"),
-  matchupEdge(A, B, "n_spg", "Steals"),
-  matchupEdge(A, B, "n_bpg", "Blocks"),
-];
+  const report = [
+    matchupEdge(A, B, "n_three", "3PT Shooting"),
+    matchupEdge(A, B, "n_apg", "Playmaking"),
+    matchupEdge(A, B, "n_rpg", "Rebounding"),
+    matchupEdge(A, B, "n_spg", "Steals"),
+    matchupEdge(A, B, "n_bpg", "Blocks"),
+  ];
 
   // FIX: A's tips = A vs B, B's tips = B vs A — keeps them distinct
   const recA = aiRecommendations(A, B);
@@ -387,11 +462,13 @@ const report = [
 // ==================================================
 
 function radarPoints(values, cx, cy, radius) {
-  return values.map((value, i) => {
-    const angle = -Math.PI / 2 + (2 * Math.PI * i) / values.length;
-    const r     = radius * (Math.max(0, Math.min(100, value)) / 100);
-    return `${cx + Math.cos(angle) * r},${cy + Math.sin(angle) * r}`;
-  }).join(" ");
+  return values
+    .map((value, i) => {
+      const angle = -Math.PI / 2 + (2 * Math.PI * i) / values.length;
+      const r = radius * (Math.max(0, Math.min(100, value)) / 100);
+      return `${cx + Math.cos(angle) * r},${cy + Math.sin(angle) * r}`;
+    })
+    .join(" ");
 }
 
 function renderRadar(a, b) {
@@ -401,36 +478,65 @@ function renderRadar(a, b) {
   const aValues = [
     offenseRating(a),
     defenseRating(a),
-      a.three_pt_pct,
+    a.three_pt_pct,
     Math.min(100, a.rpg),
-Math.min(100, a.apg),
-Math.min(100, a.ppg),
-  ]
+    Math.min(100, a.apg),
+    Math.min(100, a.ppg),
+  ];
 
   const bValues = [
     offenseRating(b),
     defenseRating(b),
-      b.three_pt_pct,
+    b.three_pt_pct,
     Math.min(100, b.rpg),
-Math.min(100, b.apg),
-Math.min(100, b.ppg),
+    Math.min(100, b.apg),
+    Math.min(100, b.ppg),
   ];
 
-  const statLabels = ["Offense", "Defense", "3PT Shooting", "Rebounding", "Assists", "PPG"];
-  const labelPos   = [[200, 18], [342, 95], [342, 252], [200, 328], [55, 252], [55, 95]];
-  const cx = 200, cy = 170, radius = 140;
+  const statLabels = [
+    "Offense",
+    "Defense",
+    "3PT Shooting",
+    "Rebounding",
+    "Assists",
+    "PPG",
+  ];
+  const labelPos = [
+    [200, 18],
+    [342, 95],
+    [342, 252],
+    [200, 328],
+    [55, 252],
+    [55, 95],
+  ];
+  const cx = 200,
+    cy = 170,
+    radius = 140;
 
   const buildDots = (values, teamName, color) =>
     values.map((value, i) => {
       const angle = -Math.PI / 2 + (2 * Math.PI * i) / 6;
-      const r     = radius * (Math.max(0, Math.min(100, value)) / 100);
-      return { x: cx + Math.cos(angle) * r, y: cy + Math.sin(angle) * r, label: statLabels[i], value: Math.round(value), team: teamName, color };
+      const r = radius * (Math.max(0, Math.min(100, value)) / 100);
+      return {
+        x: cx + Math.cos(angle) * r,
+        y: cy + Math.sin(angle) * r,
+        label: statLabels[i],
+        value: Math.round(value),
+        team: teamName,
+        color,
+      };
     });
 
-  const allDots = [...buildDots(aValues, a.name, CA), ...buildDots(bValues, b.name, CB)];
-  const dotsSVG = allDots.map((d, idx) =>
-    `<circle class="radar-dot" cx="${d.x}" cy="${d.y}" r="2.5" fill="${d.color}" stroke="rgba(2,6,23,0.8)" stroke-width="2" data-idx="${idx}" style="cursor:pointer;"/>`
-  ).join("");
+  const allDots = [
+    ...buildDots(aValues, a.name, CA),
+    ...buildDots(bValues, b.name, CB),
+  ];
+  const dotsSVG = allDots
+    .map(
+      (d, idx) =>
+        `<circle class="radar-dot" cx="${d.x}" cy="${d.y}" r="4" fill="${d.color}" stroke="rgba(2,6,23,0.8)" stroke-width="2" data-idx="${idx}" style="cursor:pointer;"/>`,
+    )
+    .join("");
 
   return `
     <div class="card pro-card" style="margin-top:22px;">
@@ -461,7 +567,7 @@ Math.min(100, b.ppg),
 function attachRadarTooltip() {
   const svg = document.getElementById("radarSvg");
   if (!svg) return;
-  const tooltip  = document.getElementById("radarTooltip");
+  const tooltip = document.getElementById("radarTooltip");
   const dotsData = JSON.parse(svg.dataset.dots);
 
   svg.querySelectorAll(".radar-dot").forEach((dot) => {
@@ -471,19 +577,19 @@ function attachRadarTooltip() {
       tooltip.classList.remove("hidden");
       positionTooltip(e, tooltip);
     });
-    dot.addEventListener("mousemove",  (e) => positionTooltip(e, tooltip));
-    dot.addEventListener("mouseleave", ()  => tooltip.classList.add("hidden"));
+    dot.addEventListener("mousemove", (e) => positionTooltip(e, tooltip));
+    dot.addEventListener("mouseleave", () => tooltip.classList.add("hidden"));
   });
 }
 
 function positionTooltip(e, tooltip) {
   const rect = tooltip.parentElement.getBoundingClientRect();
   let x = e.clientX - rect.left + 14;
-  let y = e.clientY - rect.top  - 42;
+  let y = e.clientY - rect.top - 42;
   if (x + 150 > rect.width) x = e.clientX - rect.left - 155;
-  if (y < 0)                 y = e.clientY - rect.top  + 14;
+  if (y < 0) y = e.clientY - rect.top + 14;
   tooltip.style.left = x + "px";
-  tooltip.style.top  = y + "px";
+  tooltip.style.top = y + "px";
 }
 
 // ==================================================
@@ -495,8 +601,8 @@ function positionTooltip(e, tooltip) {
 function switchFocusTab(tab) {
   const panelA = document.getElementById("focusPanelA");
   const panelB = document.getElementById("focusPanelB");
-  const btnA   = document.getElementById("focusBtnA");
-  const btnB   = document.getElementById("focusBtnB");
+  const btnA = document.getElementById("focusBtnA");
+  const btnB = document.getElementById("focusBtnB");
 
   // Guard: if elements don't exist yet, do nothing
   if (!panelA || !panelB || !btnA || !btnB) return;
@@ -504,8 +610,8 @@ function switchFocusTab(tab) {
   const showA = tab === "A";
 
   panelA.classList.toggle("hidden", !showA);
-  panelB.classList.toggle("hidden",  showA);
-  btnA.classList.toggle("tab-active",  showA);
+  panelB.classList.toggle("hidden", showA);
+  btnA.classList.toggle("tab-active", showA);
   btnB.classList.toggle("tab-active", !showA);
 }
 
@@ -536,23 +642,33 @@ function renderComparison() {
     return;
   }
 
-  const a  = selectedTeamA;
-  const b  = selectedTeamB;
+  const a = selectedTeamA;
+  const b = selectedTeamB;
   const CA = "#3b82f6";
   const CB = "#14b8a6";
   const ai = runComparerAnalysis(a, b);
 
-const bars = [
-  ["3PT Shooting", a.three_pt_pct, b.three_pt_pct, 45],
-  ["Assists", a.apg, b.apg, 25],
-  ["Rebounding", a.rpg, b.rpg, 45],
-  ["Steals", a.spg, b.spg, 12],
-  ["Blocks", a.bpg, b.bpg, 8],
-  ["PPG", a.ppg, b.ppg, 100],
-];
+  const bars = [
+    ["3PT Shooting", a.three_pt_pct, b.three_pt_pct, 45],
+    ["Assists", a.apg, b.apg, 25],
+    ["Rebounding", a.rpg, b.rpg, 45],
+    ["Steals", a.spg, b.spg, 12],
+    ["Blocks", a.bpg, b.bpg, 8],
+    ["PPG", a.ppg, b.ppg, 100],
+  ];
   // Build focus tip HTML separately so we can verify they differ
-  const focusA = ai.recA.map(r => `<div class="focus-item" style="border-left-color:${CA};">${r}</div>`).join("");
-  const focusB = ai.recB.map(r => `<div class="focus-item" style="border-left-color:${CB};">${r}</div>`).join("");
+  const focusA = ai.recA
+    .map(
+      (r) =>
+        `<div class="focus-item" style="border-left-color:${CA};">${r}</div>`,
+    )
+    .join("");
+  const focusB = ai.recB
+    .map(
+      (r) =>
+        `<div class="focus-item" style="border-left-color:${CB};">${r}</div>`,
+    )
+    .join("");
 
   container.innerHTML = `
 
@@ -595,7 +711,9 @@ const bars = [
             <span class="bar-legend-dot" style="background:${CA}"></span><span>${a.name}</span>
             <span class="bar-legend-dot" style="background:${CB};margin-left:14px;"></span><span>${b.name}</span>
           </div>
-          ${bars.map(([label, av, bv, max]) => `
+          ${bars
+            .map(
+              ([label, av, bv, max]) => `
             <div class="pro-row">
               <div class="pro-row-top">
                 <span>${label}</span>
@@ -607,14 +725,16 @@ const bars = [
               </div>
               <div class="pro-bars">
                 <div class="pro-bar" style="background:rgba(59,130,246,0.1);">
-                  <div style="width:${Math.min(100,(av/max)*100)}%;background:${CA};"></div>
+                  <div style="width:${Math.min(100, (av / max) * 100)}%;background:${CA};"></div>
                 </div>
                 <div class="pro-bar" style="background:rgba(20,184,166,0.1);">
-                  <div style="width:${Math.min(100,(bv/max)*100)}%;background:${CB};"></div>
+                  <div style="width:${Math.min(100, (bv / max) * 100)}%;background:${CB};"></div>
                 </div>
               </div>
             </div>
-          `).join("")}
+          `,
+            )
+            .join("")}
         </div>
 
         ${renderRadar(a, b)}
@@ -648,12 +768,16 @@ const bars = [
           <!-- MATCHUP BREAKDOWN -->
           <div class="panel-title" style="margin-top:24px;">Matchup Breakdown</div>
           <div class="breakdown-table">
-            ${ai.report.map(r => `
+            ${ai.report
+              .map(
+                (r) => `
               <div class="breakdown-row">
                 <span class="breakdown-label">${r.label}</span>
                 ${edgeBadge(r.edge, r.winner, a.name, CA, CB)}
               </div>
-            `).join("")}
+            `,
+              )
+              .join("")}
           </div>
 
           <!-- COMPETITIVE FOCUS — tabs switch between team tips -->
@@ -676,18 +800,23 @@ const bars = [
 }
 
 function showPage(page) {
-  document.getElementById("dashboardPage").classList.toggle("hidden", page !== "dashboard");
-  document.getElementById("comparisonPage").classList.toggle("hidden", page !== "comparison");
+  document
+    .getElementById("dashboardPage")
+    .classList.toggle("hidden", page !== "dashboard");
+  document
+    .getElementById("comparisonPage")
+    .classList.toggle("hidden", page !== "comparison");
 
   const buttons = document.querySelectorAll(".nav button");
   buttons.forEach((btn) => btn.classList.remove("active"));
-  if (page === "dashboard")  buttons[0].classList.add("active");
+  if (page === "dashboard") buttons[0].classList.add("active");
   if (page === "comparison") buttons[1].classList.add("active");
   if (page === "comparison") renderComparison();
 }
 
 function goToComparison() {
-  if (!selectedTeamA || !selectedTeamB || selectedTeamA.id === selectedTeamB.id) return;
+  if (!selectedTeamA || !selectedTeamB || selectedTeamA.id === selectedTeamB.id)
+    return;
   showPage("comparison");
 }
 

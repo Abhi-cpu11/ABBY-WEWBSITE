@@ -841,4 +841,14 @@ svg text {
   .analyze-btn {
     width: 100%;
   }
+
+  .main {
+    padding-bottom: 160px;
+  }
+
+  @media (max-width: 620px) {
+    .main {
+      padding-bottom: 190px;
+    }
+  }
 }
